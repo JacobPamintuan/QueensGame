@@ -145,10 +145,10 @@ def main():
                 if event.button == 1:  # Left click
                     board_data.modify_piece(row, col,-1)
                 elif event.button == 3:  # Right click
-                    print(f"Right Click on row: {row}, col: {col}")
+                    board_data.modify_piece(row, col,1)
 
 
-                board_data.modify_piece(row, col,-1)
+                
                 
 
 
