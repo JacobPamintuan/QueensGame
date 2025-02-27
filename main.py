@@ -1,8 +1,10 @@
 import pygame
 import random
 import json
+import os
 
 from board import Board
+from validate import validate_board
 
 GRID_SIZE = 8
 CELL_SIZE = 60
@@ -11,7 +13,9 @@ WINDOW_SIZE = GRID_SIZE * CELL_SIZE
 # Colors
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
-RED = (255, 0, 0)  # Queen color
+RED = (255, 0, 0)  
+GREEN = (0, 255, 0)
+
 REGION_COLORS = [
     (179, 223, 160),    # Light Green
     (163,210,216),      # Light Blue
@@ -52,8 +56,12 @@ def get_window_size():
 
 def get_board_data(mapNum: int):
     key = f"map{mapNum}"
+
+    script_dir = os.path.dirname(os.path.abspath(__file__))  
+    maps_file = os.path.join(script_dir, 'maps.json')
+
     
-    with open('maps.json', "r") as file:
+    with open(maps_file, "r") as file:
         data = json.load(file)
         
     mapData = data[key]
@@ -64,7 +72,7 @@ def load_board(board_data: Board):
     global GRID_SIZE, CELL_SIZE, WINDOW_SIZE , screen
     
     GRID_SIZE = board_data.size
-    CELL_SIZE = 1000 // GRID_SIZE
+    CELL_SIZE = 600 // GRID_SIZE
     WINDOW_SIZE = GRID_SIZE * CELL_SIZE
     
     
@@ -72,7 +80,7 @@ def load_board(board_data: Board):
     
     
     
-def draw_board(board_data : Board):
+def draw_board(board_data : Board, win : bool):
     
     # Draw regions
 
@@ -107,11 +115,14 @@ def draw_board(board_data : Board):
                 
 
    
-    
+    if win:
+        grid_color = GREEN
+    else:
+        grid_color = BLACK 
     # Draw gridlines
     for i in range(GRID_SIZE + 1):
-        pygame.draw.line(screen, BLACK, (i * CELL_SIZE, 0), (i * CELL_SIZE, WINDOW_SIZE), 2)  # Vertical
-        pygame.draw.line(screen, BLACK, (0, i * CELL_SIZE), (WINDOW_SIZE, i * CELL_SIZE), 2)  # Horizontal
+        pygame.draw.line(screen, grid_color, (i * CELL_SIZE, 0), (i * CELL_SIZE, WINDOW_SIZE), 2)  # Vertical
+        pygame.draw.line(screen, grid_color, (0, i * CELL_SIZE), (WINDOW_SIZE, i * CELL_SIZE), 2)  # Horizontal
         
     pygame.display.flip()
         
@@ -128,9 +139,11 @@ def main():
     load_board(board_data)
     
     
+    win = False
+
     running = True
     while running:
-        draw_board(board_data)
+        draw_board(board_data, win)
         
         for event in pygame.event.get():
             
@@ -144,8 +157,14 @@ def main():
 
                 if event.button == 1:  # Left click
                     board_data.modify_piece(row, col,-1)
+                    win = validate_board(board_data)
+
                 elif event.button == 3:  # Right click
                     board_data.modify_piece(row, col,1)
+                    win = validate_board(board_data)
+
+
+
 
 
                 
