@@ -12,5 +12,6 @@ REGION_COLORS = [
     (223,160,191),      # Pink
     (150,190,255),      # Light Blue
     (223,223,223),      # Grey
-    (230,243,136)       # Yellow       
+    (230,243,136),       # YellBow 
+    (187, 163, 226)     # Purple
     ]

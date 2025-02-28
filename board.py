@@ -21,7 +21,7 @@ class Board:
         
 
 
-    def modify_piece(self, row, col, val):
+    def player_modify_piece(self, row, col, val):
         if 0 <= row < self.size and 0 <= col < self.size:
 
             # Toggle piece
@@ -34,7 +34,7 @@ class Board:
             print("Invalid position")
             
             
-    def draw_board(self, screen, win : bool):
+    def draw_board(self, screen, win = False):
 
 
         CELL_SIZE = 600 // self.size
@@ -84,3 +84,39 @@ class Board:
             pygame.draw.line(screen, grid_color, (0, i * CELL_SIZE), (WINDOW_SIZE, i * CELL_SIZE), 2)  # Horizontal
             
         pygame.display.flip()
+
+
+    # No toggle, Force piece
+    def algo_modify_piece(self, row, col, val):
+        if 0 <= row < self.size and 0 <= col < self.size:
+
+            self.pieces[row][col] = val
+        # else:
+        #     # print(f"Invalid position: [{row}][{col}]")
+
+    def queen_autofill(self, queen_row, queen_col):
+
+        region_id = self.regions[queen_row][queen_col]
+
+              
+        for row in range(self.size):
+            for col in range(self.size):
+                if row == queen_row and col == queen_col:
+                    self.algo_modify_piece(row, col, 1)
+
+                else:
+                    if row == queen_row:
+                        self.algo_modify_piece(row, col, -1)
+                    elif col == queen_col:
+                        self.algo_modify_piece(row, col, -1)
+                    elif self.regions[row][col] == region_id:
+                        self.algo_modify_piece(row,col,-1)
+
+        self.algo_modify_piece(queen_row-1,queen_col-1,-1)
+        self.algo_modify_piece(queen_row-1,queen_col+1,-1)
+        self.algo_modify_piece(queen_row+1,queen_col-1,-1)
+        self.algo_modify_piece(queen_row+1,queen_col+1,-1)
+
+        
+
+
