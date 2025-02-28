@@ -8,15 +8,7 @@ class Board:
         self.name = name
         self.size = size
         self.regions = regions
-
-#         self.pieces = [
-#     [1, -1, 1, -1, 1],
-#     [-1, 1, -1, 1, -1],
-#     [1, -1, 1, -1, 1],
-#     [-1, 1, -1, 1, -1],
-#     [1, -1, 1, -1, 1]
-# ]
-        
+       
         self.pieces = [[0 for _ in range(size)] for _ in range(size)]
         
 
@@ -118,5 +110,5 @@ class Board:
         self.algo_modify_piece(queen_row+1,queen_col+1,-1)
 
         
-
+    # def autofill(self, )
 

@@ -5,10 +5,10 @@ import os
 import time
 
 from board import Board
-from validate import validate_win
+from validate import Validatior
 from colors import WHITE,BLACK,RED,GREEN,REGION_COLORS
 
-import solve
+from solve import Solver
 
 
 
@@ -16,7 +16,7 @@ GRID_SIZE = 8
 CELL_SIZE = 60
 WINDOW_SIZE = GRID_SIZE * CELL_SIZE
 
-MAPNUM = 1
+MAPNUM = 89
 
 
 pygame.init()
@@ -61,6 +61,8 @@ def main():
     global GRID_SIZE, screen, regions, placed_queens, board
     
     board_data = get_board_data(MAPNUM)
+    validator = Validatior()
+    solver = Solver(validator)
     
     load_board(board_data)
     pygame.display.set_caption(f"Queen's Game - {board_data.name}")
@@ -91,15 +93,15 @@ def main():
 
                 if event.button == 1:  # Left click
                     board_data.player_modify_piece(row, col,-1)
-                    win = validate_win(board_data)
+                    win = validator.validate_win(board_data)
 
                 elif event.button == 3:  # Right click
                     board_data.player_modify_piece(row, col,1)
-                    win = validate_win(board_data)
+                    win = validator.validate_win(board_data)
                     
                 elif event.button == 2:
                     board_data.queen_autofill(row, col)
-                    win = validate_win(board_data)
+                    win = validator.validate_win(board_data)
 
             
                     
@@ -110,19 +112,27 @@ def main():
                     
                 if event.key == pygame.K_r:
                     board_data = get_board_data(MAPNUM)
+                    win = False
 
                 if event.key == pygame.K_s:
+                    
+                    if validator.validate_board(board_data):
+                        
+                        
 
-                    start_time = time.time()
+                        start_time = time.time()
 
-                    board_data = solve.brute_force(board_data,screen)
+                        board_data = solver.brute_force(board_data,screen)
 
-                    end_time = time.time()
-                    elapsed = end_time - start_time
-                    print(f"Solving took {elapsed:.4f} seconds")
+                        end_time = time.time()
+                        elapsed = end_time - start_time
+                        print(f"Solving took {elapsed:.4f} seconds")
 
 
-                    win = validate_win(board_data)
+                        win = validator.validate_win(board_data)
+                        
+                    else:
+                        print("Invalid Board State")
                     
 
                 
