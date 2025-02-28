@@ -16,7 +16,7 @@ GRID_SIZE = 8
 CELL_SIZE = 60
 WINDOW_SIZE = GRID_SIZE * CELL_SIZE
 
-MAPNUM = 1
+MAPNUM = 100
 
 
 pygame.init()
@@ -74,6 +74,9 @@ def main():
     attempt_solution = False
 
     running = True
+
+    history = []
+
     while running:
         board_data.draw_board(screen, win)
         
@@ -97,6 +100,11 @@ def main():
                     board_data.player_modify_piece(row, col,1)
                     win = validate_board(board_data)
 
+                elif event.button == 2:
+                    board_data.queen_autofill(row, col,history)
+                    win = validate_board(board_data)
+                elif event.button == 4:
+                    board_data.undo_last_autofill(history)
             
                     
             elif event.type == pygame.KEYDOWN:

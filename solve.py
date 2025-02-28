@@ -3,65 +3,57 @@ from validate import validate_move, validate_board
 import copy
 import pdb
 
-def brute_force_helper(board_data : Board,screen):
-
+def brute_force_helper(board_data, screen, history):
     # board_data.draw_board(screen)
-    
 
     if validate_board(board_data):
-        return True
-    
+        return True  # Found a valid configuration
+
     for row in range(board_data.size):
         for col in range(board_data.size):
-            if board_data.pieces[row][col] == 0:
+            if board_data.pieces[row][col] == 0:  # If cell is empty
 
-                temp_pieces = copy.deepcopy(board_data.pieces)
+                # Save current state and attempt to place a queen
+                board_data.queen_autofill(row, col, history)
 
-                board_data.queen_autofill(row,col)
+                # Recurse to the next step
+                if brute_force_helper(board_data, screen, history):
+                    return True  # Valid solution found
 
-                
-                if brute_force_helper(board_data, screen):
-                    return True
-                
-                else:
-                    board_data.pieces = copy.deepcopy(temp_pieces)
-                    # board_data.draw_board(screen, False)
-
-                    board_data.algo_modify_piece(row,col,-1)
-                    return brute_force_helper(board_data,screen)
-                    board_data.draw_board(screen, False)
-
+                # Undo the autofill and backtrack
+                board_data.undo_last_autofill(history)
                 # board_data.draw_board(screen, False)
 
-    # board_data.draw_board(screen, False)
-    return False
+    return False  # No valid configuration found
 
-    # board_data.queen_autofill(1,1)
 
-def brute_force(board_data : Board,screen):
+def brute_force(board_data, screen):
+    history = []  # Initialize history stack
+
     for row in range(board_data.size):
         for col in range(board_data.size):
 
-            print(f"[{row}][{col}]")
+            print(f"Trying to place a queen at [{row}][{col}]")
 
-            # if row == 0 and col == 3:
-            #     pdb.set_trace()
-
+            # Copy the board to avoid side-effects (if needed) – Optional for this case
             temp = copy.deepcopy(board_data)
-            
-            temp.queen_autofill(row,col)
 
+            # Try autofill with the queen in the current position and track changes
+            temp.queen_autofill(row, col, history)
+
+            # Draw the board for visualization
             # temp.draw_board(screen, False)
 
+            # Call the helper function to solve the board from this point
+            attempt = brute_force_helper(temp, screen, history)
 
-            attempt = brute_force_helper(temp,screen)
-
-            # temp.draw_board(screen, False)
-
-
+            # If a solution was found, apply the result to the main board
             if attempt:
                 board_data = copy.deepcopy(temp)
+                return board_data  # Return the solved board
 
-                return board_data
-            
-    print("Bruh")
+            # Reset the temporary board for the next attempt
+            # temp.draw_board(screen, False)
+
+    print("No solution found!")
+    return board_data  # No solution found, return the initial board (or handle as needed)

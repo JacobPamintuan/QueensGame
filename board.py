@@ -94,29 +94,48 @@ class Board:
         # else:
         #     # print(f"Invalid position: [{row}][{col}]")
 
-    def queen_autofill(self, queen_row, queen_col):
-
+    def queen_autofill(self, queen_row, queen_col, history):
+        """Places a queen and marks affected areas, storing changes for undo."""
+        
         region_id = self.regions[queen_row][queen_col]
 
-              
+        changes = []  # Track modified cells
+        
+        def update_cell(row, col, val):
+            """Update cell and store previous value."""
+            if 0 <= row < self.size and 0 <= col < self.size:
+                if self.pieces[row][col] != val:  # Only store if change is made
+                    changes.append((row, col, self.pieces[row][col]))
+                    self.pieces[row][col] = val
+        
+
+
+        # Fill row, column, and region
         for row in range(self.size):
             for col in range(self.size):
                 if row == queen_row and col == queen_col:
-                    self.algo_modify_piece(row, col, 1)
+                    continue
+                if row == queen_row or col == queen_col or self.regions[row][col] == region_id:
+                    update_cell(row, col, -1)
 
-                else:
-                    if row == queen_row:
-                        self.algo_modify_piece(row, col, -1)
-                    elif col == queen_col:
-                        self.algo_modify_piece(row, col, -1)
-                    elif self.regions[row][col] == region_id:
-                        self.algo_modify_piece(row,col,-1)
+        # Place queen
+        update_cell(queen_row, queen_col, 1)
 
-        self.algo_modify_piece(queen_row-1,queen_col-1,-1)
-        self.algo_modify_piece(queen_row-1,queen_col+1,-1)
-        self.algo_modify_piece(queen_row+1,queen_col-1,-1)
-        self.algo_modify_piece(queen_row+1,queen_col+1,-1)
+        # Fill diagonals
+        update_cell(queen_row - 1, queen_col - 1, -1)
+        update_cell(queen_row - 1, queen_col + 1, -1)
+        update_cell(queen_row + 1, queen_col - 1, -1)
+        update_cell(queen_row + 1, queen_col + 1, -1)
+
+        history.append(changes)  # Save changes to history stack
+
 
         
 
 
+    def undo_last_autofill(self, history):
+        """Restores board state by undoing the last autofill."""
+        if history:
+            last_changes = history.pop()
+            for row, col, prev_value in last_changes:
+                self.pieces[row][col] = prev_value
