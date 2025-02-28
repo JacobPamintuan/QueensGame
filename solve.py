@@ -1,5 +1,5 @@
 from board import Board
-from validate import validate_move, validate_board
+from validate import validate_move, validate_win
 import copy
 import pdb
 
@@ -8,7 +8,7 @@ def brute_force_helper(board_data : Board,screen):
     # board_data.draw_board(screen)
     
 
-    if validate_board(board_data):
+    if validate_win(board_data):
         return True
     
     for row in range(board_data.size):
@@ -39,29 +39,35 @@ def brute_force_helper(board_data : Board,screen):
     # board_data.queen_autofill(1,1)
 
 def brute_force(board_data : Board,screen):
+    
+    original = copy.deepcopy(board_data)
+    
     for row in range(board_data.size):
         for col in range(board_data.size):
-
-            print(f"[{row}][{col}]")
-
-            # if row == 0 and col == 3:
-            #     pdb.set_trace()
-
-            temp = copy.deepcopy(board_data)
             
-            temp.queen_autofill(row,col)
+            if board_data.pieces[row][col] == 0:
 
-            # temp.draw_board(screen, False)
+                print(f"[{row}][{col}]")
+
+                # if row == 0 and col == 3:
+                #     pdb.set_trace()
+
+                temp = copy.deepcopy(board_data)
+                
+                temp.queen_autofill(row,col)
+
+                # temp.draw_board(screen, False)
 
 
-            attempt = brute_force_helper(temp,screen)
+                attempt = brute_force_helper(temp,screen)
 
-            # temp.draw_board(screen, False)
+                # temp.draw_board(screen, False)
 
 
-            if attempt:
-                board_data = copy.deepcopy(temp)
+                if attempt:
+                    board_data = copy.deepcopy(temp)
 
-                return board_data
+                    return board_data
             
-    print("Bruh")
+    print("No Solution found")
+    return original

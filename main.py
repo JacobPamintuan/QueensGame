@@ -5,7 +5,7 @@ import os
 import time
 
 from board import Board
-from validate import validate_board
+from validate import validate_win
 from colors import WHITE,BLACK,RED,GREEN,REGION_COLORS
 
 import solve
@@ -91,11 +91,15 @@ def main():
 
                 if event.button == 1:  # Left click
                     board_data.player_modify_piece(row, col,-1)
-                    win = validate_board(board_data)
+                    win = validate_win(board_data)
 
                 elif event.button == 3:  # Right click
                     board_data.player_modify_piece(row, col,1)
-                    win = validate_board(board_data)
+                    win = validate_win(board_data)
+                    
+                elif event.button == 2:
+                    board_data.queen_autofill(row, col)
+                    win = validate_win(board_data)
 
             
                     
@@ -103,6 +107,9 @@ def main():
 
                 if event.key == pygame.K_q:
                     running = False
+                    
+                if event.key == pygame.K_r:
+                    board_data = get_board_data(MAPNUM)
 
                 if event.key == pygame.K_s:
 
@@ -115,7 +122,7 @@ def main():
                     print(f"Solving took {elapsed:.4f} seconds")
 
 
-                    win = validate_board(board_data)
+                    win = validate_win(board_data)
                     
 
                 
