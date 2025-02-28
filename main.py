@@ -111,13 +111,15 @@ def main():
                     running = False
                     
                 if event.key == pygame.K_r:
-                    board_data = get_board_data(MAPNUM)
+                    board_data.reset_board()
                     win = False
 
                 if event.key == pygame.K_s:
                     
                     if validator.validate_board(board_data):
                         
+                        board_data.solve_autofill()
+                        board_data.draw_board(screen)
                         
 
                         start_time = time.time()
@@ -126,10 +128,17 @@ def main():
 
                         end_time = time.time()
                         elapsed = end_time - start_time
-                        print(f"Solving took {elapsed:.4f} seconds")
+                        
+                        win = validator.validate_board(board_data)
+                        
+                        if win:
+                            print(f"Solving took {elapsed:.4f} seconds")
+                        else:
+                            print(f"Attempt took {elapsed:.4f} seconds")
+                            
 
 
-                        win = validator.validate_win(board_data)
+                        
                         
                     else:
                         print("Invalid Board State")

@@ -2,6 +2,8 @@ import json
 import pygame
 from colors import WHITE,BLACK,RED,GREEN,REGION_COLORS
 
+import copy
+
 
 class Board:
     def __init__(self, name, size, regions):
@@ -11,7 +13,8 @@ class Board:
        
         self.pieces = [[0 for _ in range(size)] for _ in range(size)]
         
-
+    def reset_board(self):
+        self.pieces = [[0 for _ in range(self.size)] for _ in range(self.size)]
 
     def player_modify_piece(self, row, col, val):
         if 0 <= row < self.size and 0 <= col < self.size:
@@ -109,6 +112,16 @@ class Board:
         self.algo_modify_piece(queen_row+1,queen_col-1,-1)
         self.algo_modify_piece(queen_row+1,queen_col+1,-1)
 
+        
+    def solve_autofill(self):
+        
+        prev_pieces = copy.deepcopy(self.pieces)
+        self.reset_board()
+        
+        for row in range(self.size):
+            for col in range(self.size):
+                if prev_pieces[row][col] == 1:
+                    self.queen_autofill(row,col)
         
     # def autofill(self, )
 
