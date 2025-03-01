@@ -7,6 +7,7 @@ class Solver:
     def __init__(self,validator : Validator):
         self.validator = validator
         self.num_seeds = 0
+        self.chosen_seed = (-1,-1)
 
     def brute_force_helper(self, board_data : Board,screen):
 
@@ -78,6 +79,8 @@ class Solver:
                     if attempt:
                         board_data = copy.deepcopy(temp)
 
+                        self.chosen_seed = (row,col)
+
                         return board_data
                 
         print("No Solution found")
@@ -113,6 +116,8 @@ class Solver:
 
                 if attempt:
                     board_data = copy.deepcopy(temp)
+                    self.chosen_seed = seed
+                
 
                     return board_data
                 

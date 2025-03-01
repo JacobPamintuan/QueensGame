@@ -1,12 +1,31 @@
 from board import Board
 from validate import Validator
 from solve import Solver
+import copy
 import os
 import json
 import time
 
 
 import pygame
+#  map_times[mapNum] = (
+#             elapsed_BF, 
+#             solved_BF,  # Boolean indicating if Algorithm 1 solved the map
+#             num_seeds_BF,
+#             attempt_BF,
+#             elapsed_BFOS, 
+#             solved_BFOS,  # Boolean indicating if Algorithm 2 solved the map
+#             num_seeds_BFOS,
+#             attempt_BFOS # The actual board object
+#         )
+class Stats:
+    def __init__(self, board : Board, elapsed, passed : bool, seeds_attempted : int, chosen_seed : tuple):
+        self.board = copy.deepcopy(board)
+        self.elapsed = elapsed
+        self.passed = passed
+        self.seeds_attempted = seeds_attempted
+        self.chosen_seed = chosen_seed
+
 
 CELL_SIZE = 60
 WINDOW_PADDING = 20  # Extra spacing for a cleaner look
@@ -26,52 +45,67 @@ def get_board_data(mapNum: int):
     return Board(mapData['name'], mapData['caseNumber'], mapData['colorGrid'])
 
 
-def display_boards(BF_board: Board, BF_pass, BFOS_board: Board, BFOS_pass, image_folder):
+
+def display_boards(map_data, image_folder):
     pygame.init()
     pygame.font.init()
-    """Displays both the original and solved boards side by side using Pygame."""
-    grid_size = BF_board.size
 
-    CELL_SIZE = 600//grid_size  # Keep cell size within reasonable bounds
+    # Unpack the map_data tuple
+    elapsed_BF, solved_BF, num_seeds_BF, attempt_BF, elapsed_BFOS, solved_BFOS, num_seeds_BFOS, attempt_BFOS = map_data
+
+    grid_size = attempt_BF.size
+    CELL_SIZE = 600 // grid_size  # Keep cell size within reasonable bounds
 
     WINDOW_SIZE = grid_size * CELL_SIZE
-    WINDOW_PADDING = 30  # Increase padding slightly
-    screen_width = (WINDOW_SIZE * 2) + WINDOW_PADDING + 10  # Ensure enough width
-    screen_height = WINDOW_SIZE + 60  # Add extra space for captions
+    WINDOW_PADDING = 30  
+    screen_width = (WINDOW_SIZE * 2) + WINDOW_PADDING + 10  
+    screen_height = WINDOW_SIZE + 150  # Extra height for text display
 
     screen = pygame.display.set_mode((screen_width, screen_height), pygame.RESIZABLE)
-    pygame.display.set_caption("Auto Tester - Comparing Boards")
+    pygame.display.set_caption(f"Comparison - Map {attempt_BF.name}")
 
     running = True
     while running:
         screen.fill((255, 255, 255))
-        font = pygame.font.Font(None, 36)
-        
+        font = pygame.font.Font(None, 24)
+
         # Draw captions above each board
         caption_BF = font.render("Brute Force", True, (0, 0, 0))
         caption_BFOS = font.render("Brute Force Optimal Seed", True, (0, 0, 0))
-        
+
         screen.blit(caption_BF, (WINDOW_SIZE // 2 - caption_BF.get_width() // 2, 10))
         screen.blit(caption_BFOS, (WINDOW_SIZE + WINDOW_PADDING + (WINDOW_SIZE // 2 - caption_BFOS.get_width() // 2), 10))
-        
-        # Draw boards below captions
-        BF_board.draw_board(screen.subsurface((0, 50, WINDOW_SIZE, WINDOW_SIZE)),BF_pass)
-        BFOS_board.draw_board(screen.subsurface((WINDOW_SIZE + WINDOW_PADDING, 50, WINDOW_SIZE, WINDOW_SIZE)),BFOS_pass)
-        
+
+        # Draw boards
+        attempt_BF.draw_board(screen.subsurface((0, 50, WINDOW_SIZE, WINDOW_SIZE)), solved_BF)
+        attempt_BFOS.draw_board(screen.subsurface((WINDOW_SIZE + WINDOW_PADDING, 50, WINDOW_SIZE, WINDOW_SIZE)), solved_BFOS)
+
+        # Display additional information
+        info_start_y = WINDOW_SIZE + 60
+        info_x = 20
+
+        stats = [
+            f"Brute Force - Time: {elapsed_BF:.4f}s | Solved: {solved_BF} | Seeds: {num_seeds_BF}",
+            f"Optimal Seed - Time: {elapsed_BFOS:.4f}s | Solved: {solved_BFOS} | Seeds: {num_seeds_BFOS}",
+        ]
+
+        for i, stat in enumerate(stats):
+            stat_text = font.render(stat, True, (0, 0, 0))
+            screen.blit(stat_text, (info_x, info_start_y + (i * 25)))
+
         pygame.display.flip()
-        
 
-        image_path = os.path.join(image_folder, f"comparison_map_{BF_board.name}.png")
+        # Save the image
+        image_path = os.path.join(image_folder, f"comparison_map_{attempt_BF.name}.png")
+        pygame.image.save(screen, image_path)
 
-        pygame.image.save(screen, image_path)  # Save the screen as a PNG file with map name
-
-        # Event loop to allow closing the window
+        # Event handling
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
 
-        time.sleep(2)  # Show the boards for 2 seconds before proceeding
-        running = False  # Exit loop after delay
+        time.sleep(2)  # Show the boards for 2 seconds
+        running = False
 
     pygame.quit()
 
@@ -126,7 +160,7 @@ def main():
         num_seeds_BFOS = solver.num_seeds
         print(f"Brute Force Seeds Attempted: {num_seeds_BFOS}")
 
-        display_boards(attempt_BF,solved_BF, attempt_BFOS,solved_BFOS, image_folder)
+
 
         # Storing map data: (time_BF, result_BF, time_BFOS, result_BFOS, board)
         print(f"Storing data for map #{mapNum}...")
@@ -134,12 +168,14 @@ def main():
             elapsed_BF, 
             solved_BF,  # Boolean indicating if Algorithm 1 solved the map
             num_seeds_BF,
-            attempt_BF.pieces,
+            attempt_BF,
             elapsed_BFOS, 
             solved_BFOS,  # Boolean indicating if Algorithm 2 solved the map
             num_seeds_BFOS,
-            attempt_BFOS.pieces  # The actual board object
+            attempt_BFOS # The actual board object
         )
+
+        display_boards(map_times[mapNum], image_folder)
 
     # After processing all maps, print or return the results
     print("\n-----------------------------------------------------------")
