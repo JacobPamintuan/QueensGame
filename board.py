@@ -6,12 +6,38 @@ import copy
 
 
 class Board:
-    def __init__(self, name, size, regions):
+    def __init__(self, name, size, region_map):
         self.name = name
         self.size = size
-        self.regions = regions
+        self.region_map = region_map
+
+        def set_region_dict(region_map):
+        
+            region_dict = {}
+
+            for row in range(self.size):
+                for col in range(self.size):
+                    region_id = region_map[row][col]
+
+                    region_dict.setdefault(region_id,[]).append((row,col))
+
+            return region_dict
+
+        self.region_dict = set_region_dict(region_map)
        
         self.pieces = [[0 for _ in range(size)] for _ in range(size)]
+
+    def set_region_dict(self, region_map):
+        
+        region_dict = {}
+
+        for row in range(self.size):
+            for col in range(self.size):
+                region_id = region_map[row][col]
+
+                region_map[region_dict].append(row,col)
+
+    
         
     def reset_board(self):
         self.pieces = [[0 for _ in range(self.size)] for _ in range(self.size)]
@@ -43,7 +69,7 @@ class Board:
 
         for row in range(self.size):
             for col in range(self.size):
-                color_code = self.regions[row][col]
+                color_code = self.region_map[row][col]
                 color = REGION_COLORS[color_code]
                 
 
@@ -91,7 +117,7 @@ class Board:
 
     def queen_autofill(self, queen_row, queen_col):
 
-        region_id = self.regions[queen_row][queen_col]
+        region_id = self.region_map[queen_row][queen_col]
 
               
         for row in range(self.size):
@@ -104,7 +130,7 @@ class Board:
                         self.algo_modify_piece(row, col, -1)
                     elif col == queen_col:
                         self.algo_modify_piece(row, col, -1)
-                    elif self.regions[row][col] == region_id:
+                    elif self.region_map[row][col] == region_id:
                         self.algo_modify_piece(row,col,-1)
 
         self.algo_modify_piece(queen_row-1,queen_col-1,-1)
@@ -116,7 +142,7 @@ class Board:
     def solve_autofill(self):
         
         prev_pieces = copy.deepcopy(self.pieces)
-        self.reset_board()
+        # self.reset_board()
         
         for row in range(self.size):
             for col in range(self.size):

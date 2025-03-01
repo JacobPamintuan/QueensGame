@@ -43,7 +43,7 @@ class Validatior:
         for row in range(board_data.size):
             for col in range(board_data.size):
                 if board_data.pieces[row][col] == 1:
-                    regions_with_queens.append(board_data.regions[row][col])
+                    regions_with_queens.append(board_data.region_map[row][col])
                     
                     if not self.check_diagonals(board_data, row, col):
                         print("Diagonal")
@@ -84,7 +84,7 @@ class Validatior:
         for row in range(board_data.size):
             for col in range(board_data.size):
                 if board_data.pieces[row][col] == 1:
-                    regions_with_queens.append(board_data.regions[row][col])
+                    regions_with_queens.append(board_data.region_map[row][col])
                     
                     if not self.check_diagonals(board_data, row, col):
                         print("Diagonal")
@@ -123,7 +123,7 @@ class Validatior:
         for row in range(board_data.size):
             for col in range(board_data.size):
                 if board_data.pieces[row][col] == 1:
-                    regions_with_queens.append(board_data.regions[row][col])
+                    regions_with_queens.append(board_data.region_map[row][col])
 
 
         if len(regions_with_queens) != len(set(regions_with_queens)):

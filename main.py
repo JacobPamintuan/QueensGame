@@ -16,7 +16,7 @@ GRID_SIZE = 8
 CELL_SIZE = 60
 WINDOW_SIZE = GRID_SIZE * CELL_SIZE
 
-MAPNUM = 89
+MAPNUM = 67
 
 
 pygame.init()
@@ -114,8 +114,15 @@ def main():
                     board_data.reset_board()
                     win = False
 
-                if event.key == pygame.K_s:
+                if event.key == pygame.K_o or event.key == pygame.K_s:
+
+                    print(f"\nATTEMPTING SOLUTION WITH ALGO: ")
+                    if event.key == pygame.K_s:
+                        algo = solver.brute_force
+                    else:
+                        algo = solver.brute_force_optimal_seed
                     
+                   
                     if validator.validate_board(board_data):
                         
                         board_data.solve_autofill()
@@ -124,12 +131,12 @@ def main():
 
                         start_time = time.time()
 
-                        board_data = solver.brute_force(board_data,screen)
+                        board_data = algo(board_data,screen)
 
                         end_time = time.time()
                         elapsed = end_time - start_time
                         
-                        win = validator.validate_board(board_data)
+                        win = validator.validate_win(board_data)
                         
                         if win:
                             print(f"Solving took {elapsed:.4f} seconds")
