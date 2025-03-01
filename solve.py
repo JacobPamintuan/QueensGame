@@ -1,11 +1,12 @@
 from board import Board
-from validate import Validatior
+from validate import Validator
 import copy
 import pdb
 
 class Solver:
-    def __init__(self,validator : Validatior):
+    def __init__(self,validator : Validator):
         self.validator = validator
+        self.num_seeds = 0
 
     def brute_force_helper(self, board_data : Board,screen):
 
@@ -44,9 +45,12 @@ class Solver:
 
     def brute_force(self, board_data : Board,screen):
 
+        self.num_seeds = 0
+
         print("BRUTE FORCE")
         
         original = copy.deepcopy(board_data)
+        
         
         for row in range(board_data.size):
             for col in range(board_data.size):
@@ -54,6 +58,7 @@ class Solver:
                 if board_data.pieces[row][col] == 0:
 
                     print(f"ATTEMPTING SEED: [{row}][{col}]")
+                    self.num_seeds += 1
 
                     # if row == 0 and col == 3:
                     #     pdb.set_trace()
@@ -79,6 +84,9 @@ class Solver:
         return original
     
     def brute_force_optimal_seed(self, board_data : Board, screen):
+
+        self.num_seeds = 0
+
         print("BRUTE FORCE OPTIMAL SEED")
 
         original = copy.deepcopy(board_data)
@@ -94,6 +102,8 @@ class Solver:
             if board_data.pieces[row][col] == 0 or board_data.pieces[row][col] == 1:
 
                 print(f"ATTEMPTING SEED: [{row}][{col}]")
+                self.num_seeds += 1
+
 
                 temp = copy.deepcopy(board_data)
 

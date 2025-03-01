@@ -5,7 +5,7 @@ import os
 import time
 
 from board import Board
-from validate import Validatior
+from validate import Validator
 from colors import WHITE,BLACK,RED,GREEN,REGION_COLORS
 
 from solve import Solver
@@ -61,7 +61,7 @@ def main():
     global GRID_SIZE, screen, regions, placed_queens, board
     
     board_data = get_board_data(MAPNUM)
-    validator = Validatior()
+    validator = Validator()
     solver = Solver(validator)
     
     load_board(board_data)

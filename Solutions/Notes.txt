@@ -1,0 +1,7 @@
+Map 67 - Commit a2e0169a
+    - Brute force speed faster than Brute Force with seed 
+    - Regular Brute force  
+        - Attempts SEED[0][0] first - is valid, therefore only one seed needs to be tried
+    - Brute force with optimzied seed
+        - Attempts SEED[6][7] first - invalid
+        - Attempts SEED[7][7] second - valid, two seeds needed to be tried

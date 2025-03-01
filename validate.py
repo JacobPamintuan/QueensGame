@@ -1,7 +1,7 @@
 from board import Board
 import numpy as np
 
-class Validatior:
+class Validator:
     def __init__(self):
         pass
 
