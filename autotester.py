@@ -48,7 +48,7 @@ def get_board_data(mapNum: int):
 
 
 
-def display_boards(map_stats, image_folder):
+def display_boards(map_stats, mapNum, image_folder):
     pygame.init()
     pygame.font.init()
 
@@ -86,6 +86,7 @@ def display_boards(map_stats, image_folder):
     info_x = 20
 
     stats = [
+        f"Board Size: {grid_size}x{grid_size}",
         f"Algo 1 | Time: {algo1_stats.elapsed:.4f}s | Solved: {algo1_stats.passed} | Seeds: {algo1_stats.seeds_attempted} | Seed: {algo1_stats.chosen_seed}",
         f"Algo 2 | Time: {algo2_stats.elapsed:.4f}s | Solved: {algo2_stats.passed} | Seeds: {algo2_stats.seeds_attempted} | Seed: {algo2_stats.chosen_seed}",
     ]
@@ -97,7 +98,7 @@ def display_boards(map_stats, image_folder):
     pygame.display.flip()
 
     # Save the image
-    image_path = os.path.join(image_folder, f"comparison_map_{algo1_stats.board.name}.png")
+    image_path = os.path.join(image_folder, f"comparison_Map_{mapNum}.png")
     pygame.image.save(screen, image_path)
 
         # Event handling
@@ -149,7 +150,7 @@ def write_to_csv(filename, results):
 
         # Write header
         writer.writerow([
-            "Map", 
+            "Map", "Board Size",
             "BF Time (s)", "BF Solved", "BF Seeds", "BF Chosen Seed",
             "BFOS Time (s)", "BFOS Solved", "BFOS Seeds", "BFOS Chosen Seed",
             "Image Path"
@@ -157,6 +158,7 @@ def write_to_csv(filename, results):
 
         # Write all results from the list
         writer.writerows(results)
+
 
 
 def safe_write_to_csv(filename, results):
@@ -182,7 +184,7 @@ map_times = {}
 
 def main():
 
-    image_folder = "test"
+    image_folder = r"Analysis\full_list_2"
 
     os.makedirs(image_folder, exist_ok=True)
     csv_filename = os.path.join(image_folder, "output.csv")
@@ -193,9 +195,10 @@ def main():
     begin_time = time.time()
 
      # Define the specific maps to test (instead of iterating over all 100)
-    for mapNum in [1, 6, 67, 80, 89]:  # Maps you want to test
+    for mapNum in range(1,101):  # Maps you want to test
         # Get board data for the current map
         board = get_board_data(mapNum)
+        board_size = board.size
 
         # Create validator and solver objects
         validator = Validator()
@@ -218,10 +221,10 @@ def main():
 
         map_times[mapNum] = (algo1_stats, algo2_stats)
 
-        image_path = display_boards(map_times[mapNum],image_folder)
+        image_path = display_boards(map_times[mapNum],mapNum,image_folder)
 
         results.append([
-            mapNum,
+            mapNum, f"{board_size}x{board_size}",
             f"{algo1_stats.elapsed:.6f}", algo1_stats.passed, algo1_stats.seeds_attempted, algo1_stats.chosen_seed,
             f"{algo2_stats.elapsed:.6f}", algo2_stats.passed, algo2_stats.seeds_attempted, algo2_stats.chosen_seed,
             image_path  # Store the image path in the CSV

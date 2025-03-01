@@ -1,6 +1,0 @@
-Map,BF Time (s),BF Solved,BF Seeds,BF Chosen Seed,BFOS Time (s),BFOS Solved,BFOS Seeds,BFOS Chosen Seed,Image Path
-1,0.001624,True,1,"(0, 0)",0.001560,True,1,"(0, 0)",test\comparison_map_Map n° 1.png
-6,39.720374,True,8,"(0, 7)",23.348725,True,4,"(3, 0)",test\comparison_map_Map n° 6.png
-67,0.145276,True,1,"(0, 0)",8.674785,True,2,"(7, 7)",test\comparison_map_Map n° 67.png
-80,1.271830,True,1,"(0, 0)",0.177116,True,1,"(6, 6)",test\comparison_map_Map n° 80.png
-89,5.441686,True,4,"(0, 3)",2.444518,True,1,"(0, 3)",test\comparison_map_Map n° 89.png
