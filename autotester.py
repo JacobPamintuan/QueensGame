@@ -53,29 +53,33 @@ def display_boards(map_stats, mapNum, image_folder):
     pygame.font.init()
 
     algo1_stats, algo2_stats = map_stats  # Unpack the tuple
-
-    grid_size = algo1_stats.board.size
-    CELL_SIZE = 600 // grid_size  # Keep cell size within reasonable bounds
+    grid_size = algo1_stats.board.size  # Get board size
+    CELL_SIZE = 600 // grid_size  # Adjust cell size dynamically
 
     WINDOW_SIZE = grid_size * CELL_SIZE
     WINDOW_PADDING = 30  
     screen_width = (WINDOW_SIZE * 2) + WINDOW_PADDING + 10  
-    screen_height = WINDOW_SIZE + 150  # Extra height for text display
+    screen_height = WINDOW_SIZE + 200  # Extra height for text display
 
     screen = pygame.display.set_mode((screen_width, screen_height), pygame.RESIZABLE)
     pygame.display.set_caption(f"Comparison - Map {algo1_stats.board.name}")
 
-    # running = True
-    # while running:
     screen.fill((255, 255, 255))
     font = pygame.font.Font(None, 24)
 
+    # Compare final board states
+    boards_match = algo1_stats.board == algo2_stats.board
+    match_text = "Final Boards Match: YES" if boards_match else "Final Boards Match: NO"
+    match_color = (0, 150, 0) if boards_match else (200, 0, 0)  # Green for match, red for no match
+
     # Draw captions above each board
-    caption_algo1 = font.render(f"{algo1_stats.algo_name} - Algo 1", True, (0, 0, 0))
-    caption_algo2 = font.render(f"{algo2_stats.algo_name} - Algo 2", True, (0, 0, 0))
+    caption_algo1 = font.render(f"{algo1_stats.algo_name} - {grid_size}x{grid_size}", True, (0, 0, 0))
+    caption_algo2 = font.render(f"{algo2_stats.algo_name} - {grid_size}x{grid_size}", True, (0, 0, 0))
+    match_text_render = font.render(match_text, True, match_color)
 
     screen.blit(caption_algo1, (WINDOW_SIZE // 2 - caption_algo1.get_width() // 2, 10))
     screen.blit(caption_algo2, (WINDOW_SIZE + WINDOW_PADDING + (WINDOW_SIZE // 2 - caption_algo2.get_width() // 2), 10))
+    screen.blit(match_text_render, (screen_width // 2 - match_text_render.get_width() // 2, screen_height - 40))  # Centered at bottom
 
     # Draw boards
     algo1_stats.board.draw_board(screen.subsurface((0, 50, WINDOW_SIZE, WINDOW_SIZE)), algo1_stats.passed)
@@ -101,17 +105,9 @@ def display_boards(map_stats, mapNum, image_folder):
     image_path = os.path.join(image_folder, f"comparison_Map_{mapNum}.png")
     pygame.image.save(screen, image_path)
 
-        # Event handling
-        # for event in pygame.event.get():
-        #     if event.type == pygame.QUIT:
-        # running = False
-
-        # time.sleep(2)  # Show the boards for 2 seconds
-        # running = False
-
     pygame.quit()
+    return image_path, boards_match  # Return both the saved image path and whether the boards match
 
-    return image_path
 
 
 def run_algo(algo_fn, algo_name, mapNum, board : Board, solver : Solver, validator : Validator):
@@ -153,11 +149,12 @@ def write_to_csv(filename, results):
             "Map", "Board Size",
             "BF Time (s)", "BF Solved", "BF Seeds", "BF Chosen Seed",
             "BFOS Time (s)", "BFOS Solved", "BFOS Seeds", "BFOS Chosen Seed",
-            "Image Path"
+            "Boards Match", "Image Path"
         ])
 
         # Write all results from the list
         writer.writerows(results)
+
 
 
 
@@ -184,7 +181,7 @@ map_times = {}
 
 def main():
 
-    image_folder = r"Analysis\full_list_2"
+    image_folder = r"Analysis\diffs"
 
     os.makedirs(image_folder, exist_ok=True)
     csv_filename = os.path.join(image_folder, "output.csv")
@@ -221,13 +218,14 @@ def main():
 
         map_times[mapNum] = (algo1_stats, algo2_stats)
 
-        image_path = display_boards(map_times[mapNum],mapNum,image_folder)
+        image_path, boards_match = display_boards(map_times[mapNum],mapNum,image_folder)
 
         results.append([
             mapNum, f"{board_size}x{board_size}",
             f"{algo1_stats.elapsed:.6f}", algo1_stats.passed, algo1_stats.seeds_attempted, algo1_stats.chosen_seed,
             f"{algo2_stats.elapsed:.6f}", algo2_stats.passed, algo2_stats.seeds_attempted, algo2_stats.chosen_seed,
-            image_path  # Store the image path in the CSV
+            "YES" if boards_match else "NO",
+            image_path
         ])
 
 
