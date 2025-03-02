@@ -17,7 +17,7 @@ GRID_SIZE = 8
 CELL_SIZE = 60
 WINDOW_SIZE = GRID_SIZE * CELL_SIZE
 
-MAPNUM = 4
+MAPNUM = 80
 
 
 pygame.init()
@@ -125,9 +125,9 @@ def main():
                 if event.key == pygame.K_d:
                     overlap_X = deducer.all_overlap(board_data)
 
-                    for coord_sets in overlap_X:
-                        for row, col in coord_sets:
-                            board_data.place_piece(row,col,-1)
+                    # for coord_sets in overlap_X:
+                    #     for row, col in coord_sets:
+                    #         board_data.place_piece(row,col,-1)
 
                 if event.key == pygame.K_o or event.key == pygame.K_s:
 
