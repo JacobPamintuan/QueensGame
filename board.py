@@ -27,6 +27,16 @@ class Board:
        
         self.pieces = [[0 for _ in range(size)] for _ in range(size)]
 
+    def __eq__(self, other):
+        if not isinstance(other, Board):
+            return False
+        return (
+            self.name == other.name and
+            self.size == other.size and
+            self.region_map == other.region_map and
+            self.pieces == other.pieces
+        )
+
     def set_region_dict(self, region_map):
         
         region_dict = {}
