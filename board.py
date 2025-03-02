@@ -10,22 +10,20 @@ class Board:
         self.name = name
         self.size = size
         self.region_map = region_map
+        self.region_dict = self.set_region_dict()  # Now correctly initializes region_dict
+        self.pieces = [[0] * size for _ in range(size)]  # Cleaner initialization
 
-        def set_region_dict(region_map):
+    def set_region_dict(self):
+        """Creates and returns a dictionary mapping region IDs to their (row, col) coordinates."""
+        region_dict = {}  # Initialize an empty dictionary
+
+        for row in range(self.size):
+            for col in range(self.size):
+                region_id = self.region_map[row][col]
+                region_dict.setdefault(region_id, []).append((row, col))  # Correct usage
+
+        return region_dict  # Return the constructed dictionary
         
-            region_dict = {}
-
-            for row in range(self.size):
-                for col in range(self.size):
-                    region_id = region_map[row][col]
-
-                    region_dict.setdefault(region_id,[]).append((row,col))
-
-            return region_dict
-
-        self.region_dict = set_region_dict(region_map)
-       
-        self.pieces = [[0 for _ in range(size)] for _ in range(size)]
 
     def __eq__(self, other):
         if not isinstance(other, Board):
@@ -37,30 +35,62 @@ class Board:
             self.pieces == other.pieces
         )
 
-    def set_region_dict(self, region_map):
-        
-        region_dict = {}
 
-        for row in range(self.size):
-            for col in range(self.size):
-                region_id = region_map[row][col]
-
-                region_map[region_dict].append(row,col)
 
     
         
     def reset_board(self):
         self.pieces = [[0 for _ in range(self.size)] for _ in range(self.size)]
+        self.region_dict = self.set_region_dict()
+
+
+    def remove_position_from_region(self, region_id, position):
+        """Removes a specific (row, col) tuple from the given region_id in region_dict."""
+        if region_id in self.region_dict:
+            try:
+                self.region_dict[region_id].remove(position)  # position is a tuple (row, col)
+                if not self.region_dict[region_id]:  # Remove the region if empty
+                    del self.region_dict[region_id]
+            except ValueError:
+                # print(f"Position {position} not found in region {region_id}.")
+                return
+        # else:
+        #     # print(f"Region {region_id} does not exist.")
+
+
+    def place_piece(self, row, col, val):
+
+        self.pieces[row][col] = val
+
+        region_id = self.region_map[row][col]
+        
+        self.remove_position_from_region(region_id, (row,col))
+
+    def remove_piece(self, row, col):
+            
+        self.pieces[row][col] = 0
+
+        region_id = self.region_map[row][col]
+        
+        self.region_dict.setdefault(region_id, []).append((row, col))
+
+        
+
+        
 
     def player_modify_piece(self, row, col, val):
         if 0 <= row < self.size and 0 <= col < self.size:
 
-            # Toggle piece
-            if self.pieces[row][col] == val:
-                self.pieces[row][col] = 0
+            # If empty or toggle piece, update dict
+            if self.pieces[row][col] == 0:
+                self.place_piece(row,col,val)
 
+            elif self.pieces[row][col] == val:
+                self.remove_piece(row,col)
+
+            # If switching between X/Queen, no need to update dict
             else:
-                self.pieces[row][col] = val
+                self.pieces[row][col] == val
         else:
             print("Invalid position")
             
@@ -119,11 +149,16 @@ class Board:
 
     # No toggle, Force piece
     def algo_modify_piece(self, row, col, val):
+
+        if 0 <= row < self.size and 0 <= col < self.size:
+            self.place_piece(row,col,val)
+        return
+
         if 0 <= row < self.size and 0 <= col < self.size:
 
             self.pieces[row][col] = val
-        # else:
-        #     # print(f"Invalid position: [{row}][{col}]")
+
+
 
     def queen_autofill(self, queen_row, queen_col):
 

@@ -116,6 +116,10 @@ def main():
 
                 if event.key == pygame.K_o or event.key == pygame.K_s:
 
+                    if win:
+                        print("BOARD ALREADY SOLVED, RESET WITH R")
+                        continue
+
                     print(f"\nATTEMPTING SOLUTION WITH ALGO: ")
                     if event.key == pygame.K_s:
                         algo = solver.brute_force
