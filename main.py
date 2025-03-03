@@ -122,12 +122,19 @@ def main():
                     board_data.reset_board()
                     win = False
 
-                if event.key == pygame.K_d:
+                if event.key == pygame.K_d:                        
+                    
+                    start_time = time.time()
+
                     overlap_X = deducer.all_overlap(board_data)
 
-                    # for coord_sets in overlap_X:
-                    #     for row, col in coord_sets:
-                    #         board_data.place_piece(row,col,-1)
+                    end_time = time.time()
+                    elapsed = end_time - start_time
+
+                    print(f"Deduction took {elapsed:.4f} seconds")
+
+
+
 
                 if event.key == pygame.K_o or event.key == pygame.K_s:
 

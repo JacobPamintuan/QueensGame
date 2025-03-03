@@ -90,7 +90,7 @@ class Board:
 
             # If switching between X/Queen, no need to update dict
             else:
-                self.pieces[row][col] == val
+                self.pieces[row][col] = val
         else:
             print("Invalid position")
             
