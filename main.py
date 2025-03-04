@@ -17,7 +17,7 @@ GRID_SIZE = 8
 CELL_SIZE = 60
 WINDOW_SIZE = GRID_SIZE * CELL_SIZE
 
-MAPNUM = 80
+MAPNUM = 80 # 94
 
 
 pygame.init()
@@ -126,13 +126,22 @@ def main():
                     
                     start_time = time.time()
 
-                    overlap_X = deducer.all_overlap(board_data)
+                    # deduction = True
+
+                    # while(deduction):
+                    #     deduction = deducer.all_overlap(board_data)
+                    
+                    
+                    
+                    overlap_X = deducer.internal_overlap(board_data)
 
                     end_time = time.time()
                     elapsed = end_time - start_time
 
                     print(f"Deduction took {elapsed:.4f} seconds")
 
+                # if event.key == pygame.K_e:
+                #     deducer.double_overlap(board_data)
 
 
 

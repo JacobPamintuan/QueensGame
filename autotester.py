@@ -1,6 +1,7 @@
 from board import Board
 from validate import Validator
 from solve import Solver
+from deduce import Deducer
 import copy
 import os
 import json
@@ -9,16 +10,7 @@ import csv
 import os
 
 import pygame
-#  map_times[mapNum] = (
-#             elapsed_BF, 
-#             solved_BF,  # Boolean indicating if Algorithm 1 solved the map
-#             num_seeds_BF,
-#             attempt_BF,
-#             elapsed_BFOS, 
-#             solved_BFOS,  # Boolean indicating if Algorithm 2 solved the map
-#             num_seeds_BFOS,
-#             attempt_BFOS # The actual board object
-#         )
+
 class Stats:
     def __init__(self, algo_name, board : Board, elapsed, passed : bool, seeds_attempted : int, chosen_seed : tuple):
         self.algo_name = algo_name
@@ -110,7 +102,7 @@ def display_boards(map_stats, mapNum, image_folder):
 
 
 
-def run_algo(algo_fn, algo_name, mapNum, board : Board, solver : Solver, validator : Validator):
+def run_algo(algo_fn, algo_name, mapNum, board : Board, solver : Solver, validator : Validator, deducer=None):
     print("\n-----------------------------------------------------------")
     print(f"MAP #{mapNum}")
 
@@ -118,7 +110,7 @@ def run_algo(algo_fn, algo_name, mapNum, board : Board, solver : Solver, validat
     print(f"Running {algo_name} algorithm...")
 
     start_time = time.time()
-    final_board = algo_fn(board, None)
+    final_board = algo_fn(board, deducer, solver)
     end_time = time.time()
     
     elapsed = end_time - start_time  # Time taken for brute_force
@@ -176,12 +168,28 @@ def format_time(seconds):
     seconds = seconds % 60
     return f"{hours}h {minutes}m {seconds:.2f}s"
 
+
+def deduce_BF(board: Board, deducer: Deducer, solver : Solver):
+    deduction = True
+    while(deduction):
+        deduction = deducer.internal_overlap(board)
+
+    return solver.brute_force(board,None)
+
+def deduce_BFOS(board: Board, deducer: Deducer, solver : Solver):
+    deduction = True
+    while(deduction):
+        deduction = deducer.internal_overlap(board)
+
+    return solver.brute_force_optimal_seed(board,None)
+
+
 # Initialize the dictionary to store map data
 map_times = {}
 
 def main():
 
-    image_folder = r"Analysis\diffs"
+    image_folder = r"Analysis\Internal_Deduction"
 
     os.makedirs(image_folder, exist_ok=True)
     csv_filename = os.path.join(image_folder, "output.csv")
@@ -200,17 +208,18 @@ def main():
         # Create validator and solver objects
         validator = Validator()
         solver = Solver(validator)
+        deducer = Deducer()
 
-        algo_1_name = "Brute Force"
-        algo1 = solver.brute_force
+        algo_1_name = "Internal Deduction -> Brute Force"
+        algo1 = deduce_BF
 
-        algo1_stats = run_algo(algo1, algo_1_name,mapNum,board,solver,validator)
+        algo1_stats = run_algo(algo1, algo_1_name,mapNum,board,solver,validator,deducer)
 
         
-        algo_2_name = "Brute Force Optimal Seed"
-        algo2 = solver.brute_force_optimal_seed
+        algo_2_name = "Internal Deduction -> Brute Force Optimal Seed"
+        algo2 = deduce_BFOS
 
-        algo2_stats = run_algo(algo2, algo_2_name,mapNum,board,solver,validator)
+        algo2_stats = run_algo(algo2, algo_2_name,mapNum,board,solver,validator,deducer)
 
         
 

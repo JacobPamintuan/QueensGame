@@ -27,11 +27,11 @@ class Deducer:
             test_board = copy.deepcopy(board)
 
         common_coords = set.intersection(*X_positions)
-        print(f"{region_id}: {common_coords}")
+        # print(f"{region_id}: {common_coords}")
         return common_coords
 
 
-    def all_overlap(self, board :Board):
+    def internal_overlap(self, board :Board):
         overlap = []
 
         prev_board = copy.deepcopy(board)
@@ -42,12 +42,22 @@ class Deducer:
             if common_coords:
                 overlap.append(common_coords)
 
-        for coord_sets in overlap:
-            for row, col in coord_sets:
-                board.place_piece(row,col,-1)
+        if overlap:
 
-        if board == prev_board:
-            print("NO FURTHER DEDUCTIONS")
+            overlap = set.union(*overlap)
+        
+        for row, col in overlap:
+            board.place_piece(row,col,-1)
+
+        # for coord_sets in overlap:
+        #     for row, col in coord_sets:
+        #         board.place_piece(row,col,-1)
+                
+        if board.pieces == prev_board.pieces:
+            # print("NO FURTHER DEDUCTIONS")
+            return False
+        
+        return True
 
         # print(overlap)
         # return overlap

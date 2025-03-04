@@ -13,6 +13,6 @@ venv/
 .DS_Store
 Thumbs.db
 
-Analysis/
+Analysis/**/*.png
 random_scripts/
 TODO
