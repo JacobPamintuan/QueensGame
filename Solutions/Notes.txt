@@ -17,3 +17,4 @@ Board Reduction
 
 Remainder of
 		- reduce region_dict when Xs are placed
+			- Issue: removing X, must add it back to dict

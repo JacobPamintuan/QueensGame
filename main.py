@@ -9,6 +9,7 @@ from validate import Validator
 from colors import WHITE,BLACK,RED,GREEN,REGION_COLORS
 
 from solve import Solver
+from deduce import Deducer
 
 
 
@@ -16,7 +17,7 @@ GRID_SIZE = 8
 CELL_SIZE = 60
 WINDOW_SIZE = GRID_SIZE * CELL_SIZE
 
-MAPNUM = 67
+MAPNUM = 80 # 94
 
 
 pygame.init()
@@ -58,11 +59,12 @@ def load_board(board_data: Board):
         
 
 def main():
-    global GRID_SIZE, screen, regions, placed_queens, board
+    global GRID_SIZE, screen, regions, placed_queens, board, MAPNUM
     
     board_data = get_board_data(MAPNUM)
     validator = Validator()
     solver = Solver(validator)
+    deducer = Deducer()
     
     load_board(board_data)
     pygame.display.set_caption(f"Queen's Game - {board_data.name}")
@@ -109,12 +111,45 @@ def main():
 
                 if event.key == pygame.K_q:
                     running = False
+
+                if event.key == pygame.K_n:
+                    MAPNUM += 1
+                    board_data = get_board_data(MAPNUM)
+                    pygame.display.set_caption(f"Queen's Game - {board_data.name}")
+
                     
                 if event.key == pygame.K_r:
                     board_data.reset_board()
                     win = False
 
+                if event.key == pygame.K_d:                        
+                    
+                    start_time = time.time()
+
+                    # deduction = True
+
+                    # while(deduction):
+                    #     deduction = deducer.all_overlap(board_data)
+                    
+                    
+                    
+                    overlap_X = deducer.internal_overlap(board_data)
+
+                    end_time = time.time()
+                    elapsed = end_time - start_time
+
+                    print(f"Deduction took {elapsed:.4f} seconds")
+
+                # if event.key == pygame.K_e:
+                #     deducer.double_overlap(board_data)
+
+
+
                 if event.key == pygame.K_o or event.key == pygame.K_s:
+
+                    if win:
+                        print("BOARD ALREADY SOLVED, RESET WITH R")
+                        continue
 
                     print(f"\nATTEMPTING SOLUTION WITH ALGO: ")
                     if event.key == pygame.K_s:
