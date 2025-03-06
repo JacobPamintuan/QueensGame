@@ -1,5 +1,7 @@
 from board import Board
 import copy 
+
+from collections import defaultdict
 class Deducer:
     def __init__(self):
         pass
@@ -23,11 +25,13 @@ class Deducer:
         for cell in board.region_dict[region_id]:
             test_board.queen_autofill(cell[0],cell[1])
 
+
+            # Add positions that became an X after placing a queen
             X_positions.append(self.get_X_positions(test_board))
             test_board = copy.deepcopy(board)
 
         common_coords = set.intersection(*X_positions)
-        # print(f"{region_id}: {common_coords}")
+        #print(f"{region_id}: {common_coords}")
         return common_coords
 
 
@@ -54,10 +58,102 @@ class Deducer:
         #         board.place_piece(row,col,-1)
                 
         if board.pieces == prev_board.pieces:
-            # print("NO FURTHER DEDUCTIONS")
+            #print("NO FURTHER INTERNAL DEDUCTIONS")
             return False
         
         return True
 
-        # print(overlap)
+        # #print(overlap)
         # return overlap
+        
+
+    def fill_rows(self, board : Board, region_id_list, rows_to_fill):
+        
+        do_not_fill = []
+        for region_id in region_id_list:
+            do_not_fill.extend(board.region_dict[region_id])
+        
+        for row in rows_to_fill:
+            for col in range(board.size):
+                if (row,col) not in do_not_fill:
+                    board.place_piece(row,col,-1)
+
+
+    def fill_cols(self, board : Board, region_id_list, cols_to_fill):
+        do_not_fill = []
+        for region_id in region_id_list:
+            do_not_fill.extend(board.region_dict[region_id])
+        
+        for col in cols_to_fill:
+            for row in range(board.size):
+                if (row,col) not in do_not_fill:
+                    board.place_piece(row,col,-1)
+
+
+
+    def region_line_deduction(self, board:Board):
+        prev_board = copy.deepcopy(board)
+
+
+        row_dict = defaultdict(list)
+        col_dict = defaultdict(list)
+
+        for region_id, positions in board.region_dict.items():
+            region_row = set()
+            region_col = set()
+            for row, col in positions:
+                region_row.add(row)
+                region_col.add(col)
+
+            row_key = tuple(sorted(region_row))
+            col_key = tuple(sorted(region_col))
+
+            if row_key:
+                row_dict[row_key].append(region_id)
+            if col_key:
+                col_dict[col_key].append(region_id)
+
+
+        #print("Region Line Deduction")
+        for row_list, region_id_list in row_dict.items():
+            if len(row_list) == len(region_id_list):
+
+                #print(f"Row: {row_list}: {region_id_list}")
+                self.fill_rows(board,region_id_list,list(row_list))
+        
+        #print()
+        for col_list, region_id_list in col_dict.items():
+            if len(col_list) == len(region_id_list):
+                #print(f"Column: {col_list}: {region_id_list}")
+                self.fill_cols(board,region_id_list,list(col_list))
+
+        #print()
+        if board.pieces == prev_board.pieces:
+            #print("NO FURTHER INTERNAL DEDUCTIONS")
+            return False
+        
+        return True
+    
+
+    def reduce_board_state(self, board):
+        # Start by running both functions
+        while True:
+            # Copy the current state to check for changes
+            previous_state = copy.deepcopy(board)
+
+            # Run both functions on the board
+            func1_changed = self.internal_overlap(board)  # Run first function
+            func2_changed = self.region_line_deduction(board)  # Run second function
+
+            # If neither function caused a change in the board state, stop
+            if not func1_changed and not func2_changed:
+                break  # No change, exit the loop
+
+            # Otherwise, continue with the new state
+            if board == previous_state:
+                break  # If the state hasn't changed, break the loop
+
+        return
+
+
+            

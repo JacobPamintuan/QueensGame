@@ -131,18 +131,20 @@ def run_algo(algo_fn, algo_name, mapNum, board : Board, solver : Solver, validat
 
 
 
-def write_to_csv(filename, results):
-    """Overwrites the CSV file with all results at once."""
+def write_to_csv(filename, results, algo1_name, algo2_name):
+    """Overwrites the CSV file with all results at once, with dynamic headers."""
     with open(filename, mode="w", newline="") as file:  # "w" mode to overwrite
         writer = csv.writer(file)
 
-        # Write header
-        writer.writerow([
+        # Dynamically generate the header based on algorithm names
+        header = [
             "Map", "Board Size",
-            "BF Time (s)", "BF Solved", "BF Seeds", "BF Chosen Seed",
-            "BFOS Time (s)", "BFOS Solved", "BFOS Seeds", "BFOS Chosen Seed",
+            f"{algo1_name} Time (s)", f"{algo1_name} Solved", f"{algo1_name} Seeds", f"{algo1_name} Chosen Seed",
+            f"{algo2_name} Time (s)", f"{algo2_name} Solved", f"{algo2_name} Seeds", f"{algo2_name} Chosen Seed",
             "Boards Match", "Image Path"
-        ])
+        ]
+        
+        writer.writerow(header)  # Write header
 
         # Write all results from the list
         writer.writerows(results)
@@ -150,16 +152,18 @@ def write_to_csv(filename, results):
 
 
 
-def safe_write_to_csv(filename, results):
+
+def safe_write_to_csv(filename, results, algo_1_name, algo_2_name):
     """Tries to write to the CSV file, prompting the user if the file is open."""
     while True:
         try:
-            write_to_csv(filename, results)
+            write_to_csv(filename, results, algo_1_name, algo_2_name)  # Pass algorithm names
             print(f"Results successfully saved to {filename}.")
             break  # Exit loop if successful
         except PermissionError:
             print(f"Error: Could not save {filename}. The file might be open.")
             input("Please close the file and press Enter to retry...")
+
 
 def format_time(seconds):
     """Formats time into hours, minutes, and seconds."""
@@ -169,19 +173,25 @@ def format_time(seconds):
     return f"{hours}h {minutes}m {seconds:.2f}s"
 
 
-def deduce_BF(board: Board, deducer: Deducer, solver : Solver):
+def internal_deduce_BF(board: Board, deducer: Deducer, solver : Solver):
     deduction = True
     while(deduction):
         deduction = deducer.internal_overlap(board)
 
     return solver.brute_force(board,None)
 
-def deduce_BFOS(board: Board, deducer: Deducer, solver : Solver):
+def internal_deduce_BFOS(board: Board, deducer: Deducer, solver : Solver):
     deduction = True
     while(deduction):
         deduction = deducer.internal_overlap(board)
 
     return solver.brute_force_optimal_seed(board,None)
+
+def internal_rowcol_deduce_BFOS(board: Board, deducer: Deducer, solver : Solver):
+    deducer.reduce_board_state(board)
+
+    return solver.brute_force_optimal_seed(board,None)
+    
 
 
 # Initialize the dictionary to store map data
@@ -189,7 +199,7 @@ map_times = {}
 
 def main():
 
-    image_folder = r"Analysis\Internal_Deduction"
+    image_folder = r"Analysis\Internal_Deduction1"
 
     os.makedirs(image_folder, exist_ok=True)
     csv_filename = os.path.join(image_folder, "output.csv")
@@ -210,14 +220,16 @@ def main():
         solver = Solver(validator)
         deducer = Deducer()
 
-        algo_1_name = "Internal Deduction -> Brute Force"
-        algo1 = deduce_BF
+        algo_1_name = "Internal Deduction -> Brute Force Optimal Seed"
+        # algo1 = internal_deduce_BFOS
+        algo1 = internal_deduce_BF
 
         algo1_stats = run_algo(algo1, algo_1_name,mapNum,board,solver,validator,deducer)
 
         
-        algo_2_name = "Internal Deduction -> Brute Force Optimal Seed"
-        algo2 = deduce_BFOS
+        algo_2_name = "Internal + Row/Col Deduction Brute Force Optimal Seed"
+        # algo2 = internal_rowcol_deduce_BFOS
+        algo2 = internal_deduce_BFOS
 
         algo2_stats = run_algo(algo2, algo_2_name,mapNum,board,solver,validator,deducer)
 
@@ -240,37 +252,18 @@ def main():
 
         
         try:
-            write_to_csv(csv_filename, results)
+            write_to_csv(csv_filename, results,algo_1_name,algo_2_name)
         except PermissionError:
             print(f"Warning: Could not save {csv_filename}. The file might be open. Skipping save...")
 
         print(f"Time Elapsed so far : {format_time(time.time() - begin_time)}")
 
 
-    safe_write_to_csv(csv_filename, results)
+    safe_write_to_csv(csv_filename, results, algo_1_name, algo_2_name)
 
 
-    # After processing all maps, print the results
-    print("\n-----------------------------------------------------------")
-    print("Results after processing all maps:")
 
-    for mapNum, (algo1_stats, algo2_stats) in map_times.items():
-        print(f"\nMap {mapNum}:")
-        print(f"  {algo1_stats.algo_name}:")
-        print(f"    - Time Taken: {algo1_stats.elapsed:.6f}s")
-        print(f"    - Solved: {algo1_stats.passed}")
-        print(f"    - Seeds Attempted: {algo1_stats.seeds_attempted}")
-        print(f"    - Chosen Seed: {algo1_stats.chosen_seed}")
-        # print(f"    - Final Board State: {algo1_stats.board.pieces}")
 
-        print(f"\n  {algo2_stats.algo_name}:")
-        print(f"    - Time Taken: {algo2_stats.elapsed:.6f}s")
-        print(f"    - Solved: {algo2_stats.passed}")
-        print(f"    - Seeds Attempted: {algo2_stats.seeds_attempted}")
-        print(f"    - Chosen Seed: {algo2_stats.chosen_seed}")
-        # print(f"    - Final Board State: {algo2_stats.board.pieces}")
-
-    print("\n-----------------------------------------------------------")
 
 
     total_time = time.time() - begin_time
