@@ -199,7 +199,10 @@ map_times = {}
 
 def main():
 
-    image_folder = r"Analysis\Internal_Deduction1"
+    image_folder = r""
+
+    if image_folder == "":
+        return
 
     os.makedirs(image_folder, exist_ok=True)
     csv_filename = os.path.join(image_folder, "output.csv")

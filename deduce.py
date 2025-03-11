@@ -58,7 +58,7 @@ class Deducer:
         #         board.place_piece(row,col,-1)
                 
         if board.pieces == prev_board.pieces:
-            #print("NO FURTHER INTERNAL DEDUCTIONS")
+            print("NO FURTHER INTERNAL DEDUCTIONS")
             return False
         
         return True
@@ -129,7 +129,7 @@ class Deducer:
 
         #print()
         if board.pieces == prev_board.pieces:
-            #print("NO FURTHER INTERNAL DEDUCTIONS")
+            print("NO FURTHER ROW/COL DEDUCTIONS")
             return False
         
         return True

@@ -9,9 +9,9 @@ class Solver:
         self.num_seeds = 0
         self.chosen_seed = (-1,-1)
 
-    def brute_force_helper(self, board_data : Board,screen):
+    def brute_force_helper(self, board_data : Board):
 
-        # board_data.draw_board(screen)
+  
         
 
         if self.validator.validate_win(board_data):
@@ -26,25 +26,24 @@ class Solver:
                     board_data.queen_autofill(row,col)
 
                     
-                    if self.brute_force_helper(board_data, screen):
+                    if self.brute_force_helper(board_data):
                         return True
                     
                     else:
                         board_data.pieces = copy.deepcopy(temp_pieces)
-                        # board_data.draw_board(screen, False)
 
-                        board_data.algo_modify_piece(row,col,-1)
-                        return self.brute_force_helper(board_data,screen)
-                        board_data.draw_board(screen, False)
 
-                    # board_data.draw_board(screen, False)
+                        board_data.place_piece(row,col,-1)
+                        return self.brute_force_helper(board_data)
 
-        # board_data.draw_board(screen, False)
+
+
+
         return False
 
         # board_data.queen_autofill(1,1)
 
-    def brute_force(self, board_data : Board,screen):
+    def brute_force(self, board_data : Board):
 
         self.num_seeds = 0
 
@@ -61,19 +60,14 @@ class Solver:
                     print(f"ATTEMPTING SEED: [{row}][{col}]")
                     self.num_seeds += 1
 
-                    # if row == 0 and col == 3:
-                    #     pdb.set_trace()
+
 
                     temp = copy.deepcopy(board_data)
                     
                     temp.queen_autofill(row,col)
 
-                    # temp.draw_board(screen, False)
+                    attempt = self.brute_force_helper(temp)
 
-
-                    attempt = self.brute_force_helper(temp,screen)
-
-                    # temp.draw_board(screen, False)
 
 
                     if attempt:
@@ -86,7 +80,7 @@ class Solver:
         print("No Solution found")
         return original
     
-    def brute_force_optimal_seed(self, board_data : Board, screen):
+    def brute_force_optimal_seed(self, board_data : Board):
 
         self.num_seeds = 0
 
@@ -112,7 +106,7 @@ class Solver:
 
                 temp.queen_autofill(row, col)
 
-                attempt = self.brute_force_helper(temp,screen)
+                attempt = self.brute_force_helper(temp)
 
                 if attempt:
                     board_data = copy.deepcopy(temp)

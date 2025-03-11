@@ -1,5 +1,4 @@
 import pygame
-import random
 import json
 import os
 import time
@@ -17,7 +16,7 @@ GRID_SIZE = 8
 CELL_SIZE = 60
 WINDOW_SIZE = GRID_SIZE * CELL_SIZE
 
-MAPNUM = 80 # 96 94
+MAPNUM = 1#80 # 96 94
 
 
 pygame.init()
@@ -75,13 +74,12 @@ def main():
     
     win = False
 
-    attempt_solution = False
-
     running = True
     while running:
         board_data.draw_board(screen, win)
         
         for event in pygame.event.get():
+            board_data.draw_board(screen, win)
             
             
             
@@ -111,13 +109,7 @@ def main():
 
                 if event.key == pygame.K_q:
                     running = False
-
-                if event.key == pygame.K_n:
-                    MAPNUM += 1
-                    board_data = get_board_data(MAPNUM)
-                    pygame.display.set_caption(f"Queen's Game - {board_data.name}")
-
-                    
+                   
                 if event.key == pygame.K_r:
                     board_data.reset_board()
                     print("RESET")
@@ -127,12 +119,6 @@ def main():
                     
                     start_time = time.time()
 
-                    # deduction = True
-
-                    # while(deduction):
-                    #     deduction = deducer.all_overlap(board_data)
-                    
-                    
                     
                     overlap_X = deducer.internal_overlap(board_data)
 
@@ -161,8 +147,10 @@ def main():
 
                     print(f"FULL Deduction took {elapsed:.4f} seconds")
 
-                # if event.key == pygame.K_e:
-                #     deducer.double_overlap(board_data)
+                if event.key == pygame.K_f:
+                    deducer.reduce_board_state(board_data)
+                    board_data = solver.brute_force_optimal_seed(board_data)
+                    win = validator.validate_win(board_data)
 
                 if event.key == pygame.K_o or event.key == pygame.K_s:
 
@@ -179,13 +167,13 @@ def main():
                    
                     if validator.validate_board(board_data):
                         
-                        board_data.solve_autofill()
-                        board_data.draw_board(screen)
+                        # board_data.solve_autofill()
+                        # board_data.draw_board(screen)
                         
 
                         start_time = time.time()
 
-                        board_data = algo(board_data,screen)
+                        board_data = algo(board_data)
 
                         end_time = time.time()
                         elapsed = end_time - start_time

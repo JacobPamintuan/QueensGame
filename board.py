@@ -59,12 +59,13 @@ class Board:
 
 
     def place_piece(self, row, col, val):
+        if 0 <= row < self.size and 0 <= col < self.size:
 
-        self.pieces[row][col] = val
+            self.pieces[row][col] = val
 
-        region_id = self.region_map[row][col]
-        
-        self.remove_position_from_region(region_id, (row,col))
+            region_id = self.region_map[row][col]
+            
+            self.remove_position_from_region(region_id, (row,col))
 
     def remove_piece(self, row, col):
             
@@ -147,19 +148,6 @@ class Board:
         pygame.display.flip()
 
 
-    # No toggle, Force piece
-    def algo_modify_piece(self, row, col, val):
-
-        if 0 <= row < self.size and 0 <= col < self.size:
-            self.place_piece(row,col,val)
-        return
-
-        if 0 <= row < self.size and 0 <= col < self.size:
-
-            self.pieces[row][col] = val
-
-
-
     def queen_autofill(self, queen_row, queen_col):
 
         region_id = self.region_map[queen_row][queen_col]
@@ -168,20 +156,20 @@ class Board:
         for row in range(self.size):
             for col in range(self.size):
                 if row == queen_row and col == queen_col:
-                    self.algo_modify_piece(row, col, 1)
+                    self.place_piece(row, col, 1)
 
                 else:
                     if row == queen_row:
-                        self.algo_modify_piece(row, col, -1)
+                        self.place_piece(row, col, -1)
                     elif col == queen_col:
-                        self.algo_modify_piece(row, col, -1)
+                        self.place_piece(row, col, -1)
                     elif self.region_map[row][col] == region_id:
-                        self.algo_modify_piece(row,col,-1)
+                        self.place_piece(row,col,-1)
 
-        self.algo_modify_piece(queen_row-1,queen_col-1,-1)
-        self.algo_modify_piece(queen_row-1,queen_col+1,-1)
-        self.algo_modify_piece(queen_row+1,queen_col-1,-1)
-        self.algo_modify_piece(queen_row+1,queen_col+1,-1)
+        self.place_piece(queen_row-1,queen_col-1,-1)
+        self.place_piece(queen_row-1,queen_col+1,-1)
+        self.place_piece(queen_row+1,queen_col-1,-1)
+        self.place_piece(queen_row+1,queen_col+1,-1)
 
         
     def solve_autofill(self):
@@ -194,5 +182,4 @@ class Board:
                 if prev_pieces[row][col] == 1:
                     self.queen_autofill(row,col)
         
-    # def autofill(self, )
 
