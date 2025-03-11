@@ -32,8 +32,7 @@ def get_window_size():
 def get_board_data(mapNum: int):
     key = f"map{mapNum}"
 
-    script_dir = os.path.dirname(os.path.abspath(__file__))  
-    maps_file = os.path.join(script_dir, 'maps.json')
+    maps_file = r"maps_data\maps.json"
 
     
     with open(maps_file, "r") as file:
