@@ -48,7 +48,8 @@ class Board:
         if 0 <= row < self.size and 0 <= col < self.size:
             self.markers.discard((row,col))
 
-    def autofill_queen(self, queen_row, queen_col):
+    def player_autofill_queen(self, queen_row, queen_col):
+
         # Optionally get the region ID if needed (not used in this code)
         region_id = self.region_map[queen_row][queen_col]
         
@@ -70,9 +71,12 @@ class Board:
                 self.place_marker(queen_row, col)
 
         for r_offset, c_offset in [(-1, -1), (-1, 1), (1, -1), (1, 1)]:
-            self.remove_queen(queen_row + r_offset, queen_col + c_offset)
 
-            self.place_marker(queen_row + r_offset, queen_col + c_offset)
+            n_row = queen_row + r_offset
+            n_col = queen_col + c_offset
+
+            self.remove_queen(n_row, n_col)
+            self.place_marker(n_row, n_col)
 
         for row, col in self.region_dict[region_id]:
             self.remove_queen(row,col)
@@ -83,5 +87,47 @@ class Board:
         self.remove_marker(queen_row, queen_col)
         self.place_queen(queen_row, queen_col)
 
-            
-    
+
+    # Assume that we never wipe a previous queen or marker
+    def algo_autofill_queen(self, queen_row, queen_col):
+        self.place_queen(queen_row, queen_col)
+        
+        new_markers = set()
+
+        region_id = self.region_map[queen_row][queen_col]
+
+        for row in range(self.size):
+            if (row, queen_col) in self.markers or row == queen_row:
+                continue
+
+            new_markers.add((row, queen_col))
+            self.place_marker(row, queen_col)
+
+        for col in range(self.size):
+            if (queen_row, col) in self.markers or col == queen_col:
+                continue
+
+            new_markers.add((queen_row, col))
+            self.place_marker(queen_row, col)
+
+        for r_offset, c_offset in [(-1, -1), (-1, 1), (1, -1), (1, 1)]:
+
+            n_row = queen_row + r_offset
+            n_col = queen_col + c_offset
+
+            if (n_row, n_col) in self.markers: continue
+
+            self.place_marker(n_row, n_col)
+
+            if 0 <= n_row < self.size and 0 <= n_col < self.size:
+                new_markers.add((n_row, n_col))
+
+        for row, col in self.region_dict[region_id]:
+            if (row, col) in self.markers: continue
+            if row == queen_row and col == queen_col: continue
+
+            self.place_marker(row, col)
+            new_markers.add((row,col))
+
+
+        return new_markers

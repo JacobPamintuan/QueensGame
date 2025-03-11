@@ -9,9 +9,10 @@ sys.path.append('.')
 from r_board import Board
 from r_validation import Validator
 from gui import GUI
+from r_solve import Solver
 
 
-MAPNUM = 1
+MAPNUM = 84
 COLOR_PALETTE = "VIBRANT"
 
 def get_board_data(mapNum: int):
@@ -30,10 +31,10 @@ def load_board(board_data: Board, gui: GUI):
     gui.update_window_size(board_data.size)
 
 def main():
-    MAPNUM = 84  # Or change to your desired map number
+    # MAPNUM =   # Or change to your desired map number
     board_data = get_board_data(MAPNUM)
     validator = Validator()
-    # solver = Solver(validator)
+    solver = Solver()
     # deducer = Deducer()
 
     gui = GUI(grid_size=board_data.size, cell_size=60,color_palette_name=COLOR_PALETTE)
@@ -45,7 +46,7 @@ def main():
     running = True
     while running:
         gui.draw(board_data, win)
-        running, win = gui.handle_events(board_data, validator,win)
+        running, win = gui.handle_events(board_data, validator,solver,win)
 
         # Handle additional game logic like deductions, solving, etc.
         if not running:

@@ -12,6 +12,7 @@ sys.path.append('.')
 from Refactor.data.colors import colors
 from r_board import Board
 from r_validation import Validator
+from r_solve import Solver
 
 class GUI:
     def __init__(self, grid_size, cell_size, color_palette_name):
@@ -102,7 +103,7 @@ class GUI:
 
 
         
-    def handle_events(self, board_data : Board, validator : Validator, win):
+    def handle_events(self, board_data : Board, validator : Validator, solver: Solver, win):
         
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -123,7 +124,7 @@ class GUI:
                     self.toggle_pieces(board_data, 'O',row,col)
 
                 elif event.button == 2:  # Middle click
-                    board_data.autofill_queen(row, col)
+                    board_data.player_autofill_queen(row, col)
 
 
                 print(f"Queens: {board_data.queens}")
@@ -140,6 +141,9 @@ class GUI:
                         board_data.markers = history[1]
                     else:
                         print("Nothing to undo")
+
+                if event.key == pygame.K_b:
+                    solver.brute_force(board_data, self)
                 
                 elif event.key == pygame.K_q:
                     return False, win
