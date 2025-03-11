@@ -17,7 +17,7 @@ class Deducer:
 
         return set(pos_list)
 
-    def determine_overlap(self, board : Board, region_id):
+    def determine_internal_overlap(self, board : Board, region_id):
         test_board = copy.deepcopy(board)
         # test_board.reset_board()
 
@@ -41,7 +41,7 @@ class Deducer:
         prev_board = copy.deepcopy(board)
 
         for region_id in board.region_dict.keys():
-            common_coords = self.determine_overlap(board, region_id)
+            common_coords = self.determine_internal_overlap(board, region_id)
 
             if common_coords:
                 overlap.append(common_coords)
@@ -66,6 +66,67 @@ class Deducer:
         # #print(overlap)
         # return overlap
         
+
+    def determine_rowcol_overlap(self, board : Board, line):
+        test_board = copy.deepcopy(board)
+        # test_board.reset_board()
+
+        row_X_positions = []
+        row_Y_positions = []
+        
+        for col in range(board.size):
+            if board.pieces[line][col] == 0:
+                test_board.queen_autofill(line, col)
+
+
+                # Add positions that became an X after placing a queen
+                row_X_positions.append(self.get_X_positions(test_board))
+                test_board = copy.deepcopy(board)
+
+        common_row_coords = set.intersection(*row_X_positions)
+
+        for row in range(board.size):
+            if board.pieces[row][line] == 0:
+                test_board.queen_autofill(row, line)
+
+
+                # Add positions that became an X after placing a queen
+                row_X_positions.append(self.get_X_positions(test_board))
+                test_board = copy.deepcopy(board)
+
+        common_col_coords = set.intersection(*row_X_positions)
+
+
+        return common_row_coords, common_col_coords
+
+    def row_col_overlap(self, board : Board):
+        overlap = []
+
+        original_board = copy.deepcopy(board)
+
+        for line in range(board.size):
+            row_coords, col_coords = self.determine_rowcol_overlap(board, line)
+
+            if row_coords: overlap.append(row_coords)
+            if col_coords: overlap.append(col_coords)
+
+
+        if overlap:
+
+            overlap = set.union(*overlap)
+        
+        for row, col in overlap:
+            board.place_piece(row,col,-1)
+
+        # for coord_sets in overlap:
+        #     for row, col in coord_sets:
+        #         board.place_piece(row,col,-1)
+                
+        if board.pieces == original_board.pieces:
+            print("NO FURTHER ROW/COL DEDUCTIONS")
+            return False
+        
+        return True
 
     def fill_rows(self, board : Board, region_id_list, rows_to_fill):
         
@@ -134,6 +195,20 @@ class Deducer:
         
         return True
     
+    def place_last_piece(self, board : Board):
+
+        fill_queens = []
+
+        for region_id in board.region_dict:
+
+            empty_cells = board.region_dict[region_id]
+
+            if len(empty_cells) == 1:
+                fill_queens.append(empty_cells[0])
+
+        if fill_queens:
+            for cell in fill_queens:
+                board.queen_autofill(cell[0],cell[1])
 
     def reduce_board_state(self, board):
         # Start by running both functions
@@ -145,9 +220,13 @@ class Deducer:
             func1_changed = self.internal_overlap(board)  # Run first function
             func2_changed = self.region_line_deduction(board)  # Run second function
 
+            self.place_last_piece(board)
+
+
             # If neither function caused a change in the board state, stop
             if not func1_changed and not func2_changed:
                 break  # No change, exit the loop
+
 
             # Otherwise, continue with the new state
             if board == previous_state:
