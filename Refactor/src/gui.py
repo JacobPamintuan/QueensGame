@@ -116,23 +116,21 @@ class GUI:
                 elif event.button == 3:  # Right click
                     self.toggle_pieces(board_data, 'O',row,col)
 
-                    
+                elif event.button == 2:  # Middle click
+                    board_data.autofill_queen(row, col)
+
+
                 print(f"Queens: {board_data.queens}")
                 print(f"Markers: {board_data.markers}")
-
-
-                # elif event.button == 2:  # Middle click
-                #     board_data.queen_autofill(row, col)
-                #     win = validator.validate_win(board_data)
 
                 win = validator.validate_win(board_data)
 
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_q:
                     return False, win
-                # elif event.key == pygame.K_r:
-                #     board_data.reset_board()
-                #     print("RESET")
-                #     win = False
+                elif event.key == pygame.K_r:
+                    board_data.reset_board()
+                    print("RESET")
+                    win = False
 
         return True, win
