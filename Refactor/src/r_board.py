@@ -1,3 +1,5 @@
+from copy import deepcopy
+
 class Board:
     def __init__(self, name, size, region_map):
         self.name = name
@@ -19,6 +21,12 @@ class Board:
                 region_dict.setdefault(region_id, []).append((row, col))  # Correct usage
 
         return region_dict  # Return the constructed dictionary
+    
+    def copy(self):
+        queens_copy = deepcopy(self.queens)
+        markers_copy = deepcopy(self.markers)
+
+        return (queens_copy, markers_copy)
         
     def reset_board(self):
         self.queens = set()
@@ -62,7 +70,13 @@ class Board:
                 self.place_marker(queen_row, col)
 
         for r_offset, c_offset in [(-1, -1), (-1, 1), (1, -1), (1, 1)]:
+            self.remove_queen(queen_row + r_offset, queen_col + c_offset)
+
             self.place_marker(queen_row + r_offset, queen_col + c_offset)
+
+        for row, col in self.region_dict[region_id]:
+            self.remove_queen(row,col)
+            self.place_marker(row,col)
         
         # Remove any marker from the queen's original cell,
         # then place the queen back in that position.

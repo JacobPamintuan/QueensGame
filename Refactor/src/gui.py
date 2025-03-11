@@ -24,6 +24,9 @@ class GUI:
         self.screen = pygame.display.set_mode((self.WINDOW_SIZE, self.WINDOW_SIZE))
         pygame.display.set_caption("Queen's Game")
         
+
+        self.history = []
+
     def update_window_size(self, grid_size):
         self.GRID_SIZE = grid_size
         self.CELL_SIZE = 600 // self.GRID_SIZE
@@ -105,6 +108,9 @@ class GUI:
             if event.type == pygame.QUIT:
                 return False, win
             elif event.type == pygame.MOUSEBUTTONDOWN:
+
+                self.history.append(board_data.copy())
+
                 x, y = event.pos
                 col = x // self.CELL_SIZE
                 row = y // self.CELL_SIZE
@@ -126,7 +132,16 @@ class GUI:
                 win = validator.validate_win(board_data)
 
             elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_q:
+                if event.key == pygame.K_u:
+                    if self.history:
+                        print("UNDO!")
+                        history = self.history.pop()
+                        board_data.queens = history[0]
+                        board_data.markers = history[1]
+                    else:
+                        print("Nothing to undo")
+                
+                elif event.key == pygame.K_q:
                     return False, win
                 elif event.key == pygame.K_r:
                     board_data.reset_board()

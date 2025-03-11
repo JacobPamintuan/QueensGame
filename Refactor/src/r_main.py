@@ -30,7 +30,7 @@ def load_board(board_data: Board, gui: GUI):
     gui.update_window_size(board_data.size)
 
 def main():
-    MAPNUM = 1  # Or change to your desired map number
+    MAPNUM = 84  # Or change to your desired map number
     board_data = get_board_data(MAPNUM)
     validator = Validator()
     # solver = Solver(validator)
