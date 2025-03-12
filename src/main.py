@@ -71,7 +71,7 @@ def load_board(board_data: Board):
     
               
 MAP_PATH = R"maps_data\archivedqueens.json"
-MAPNUM = 173#80 # 96 94
+MAPNUM = 177
     
 
 def main():
@@ -160,6 +160,9 @@ def main():
 
                 if event.key == pygame.K_u:
                     board_data = history.pop()
+
+                if event.key == pygame.K_w:
+                    deducer.sliding_window(board_data)
 
                 if event.key == pygame.K_d:                        
                     

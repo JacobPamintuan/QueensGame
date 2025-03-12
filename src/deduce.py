@@ -213,7 +213,89 @@ class Deducer:
         if fill_queens:
             for cell in fill_queens:
                 board.queen_autofill(cell[0],cell[1])
+        
 
+    def exists_in_window(self, board: Board, line_dict : defaultdict):
+        
+        windows = defaultdict(list)
+        
+        for start_line in range(board.size):
+            for end_line in range(start_line + 1, board.size):
+                
+                current_window = (start_line, end_line)
+                regions = []
+                for line_tuple, regions_list in line_dict.items():
+                    if line_tuple[0] >= start_line and line_tuple[-1] <= end_line:
+                        regions.extend(regions_list)
+                
+                if regions:
+                    windows[current_window] = regions
+
+        to_delete = []
+                    
+        for window, regions in windows.items():
+            window_size = window[1]-window[0] + 1
+            if window_size != len(regions) or window_size == board.size:
+                to_delete.append(window)        
+        
+        for window in to_delete:
+            del windows[window]
+            
+           
+        return windows
+                
+
+
+
+    def sliding_window(self, board: Board):
+        
+        previous_state = copy.deepcopy(board)
+        
+
+        row_dict = defaultdict(list)
+        col_dict = defaultdict(list)
+
+        for region_id, positions in board.region_dict.items():
+            region_row = set()
+            region_col = set()
+            for row, col in positions:
+                region_row.add(row)
+                region_col.add(col)
+
+            row_key = tuple(sorted(region_row))
+            col_key = tuple(sorted(region_col))
+
+            if row_key:
+                row_dict[row_key].append(region_id)
+            if col_key:
+                col_dict[col_key].append(region_id)
+             
+        row_windows = self.exists_in_window(board, row_dict)   
+        col_windows = self.exists_in_window(board, col_dict)
+        
+        for window, region_ids in row_windows.items():
+            start, end = window
+            for row in range(start, end+1):
+                for col in range(board.size):
+                    if board.pieces[row][col] == 0 and board.region_map[row][col] not in region_ids:
+                        # print(f"X: {row},{col}")
+                        board.place_piece(row, col, -1)
+        
+        
+        for window, region_ids in col_windows.items():
+            start, end = window
+            for col in range(start, end+1):
+                for row in range(board.size):
+                    if board.pieces[row][col] == 0 and board.region_map[row][col] not in region_ids:
+                        # print(f"X: {row},{col}")
+                        board.place_piece(row, col, -1)
+       
+       
+        if board.pieces == previous_state.pieces:
+            print("NO FURTHER SLIDING DEDUCTIONS")
+            return False
+        
+        return True
     def reduce_board_state(self, board):
         # Start by running both functions
         while True:
@@ -224,7 +306,7 @@ class Deducer:
             func1_changed = self.internal_overlap(board)  # Run first function
             func2_changed = self.n_regions_line_deduction(board)  # Run second function
             func3_changed = self.row_col_overlap(board)
-
+            func4_changed = self.sliding_window(board)
 
             self.place_last_piece(board)
 
