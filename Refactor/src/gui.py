@@ -9,7 +9,7 @@ import sys
 sys.path.append('../data')
 sys.path.append('.')
 
-from Refactor.data.colors import colors
+from Refactor.data.r_colors import colors
 from r_board import Board
 from r_validation import Validator
 from r_solve import Solver
