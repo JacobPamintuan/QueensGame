@@ -6,12 +6,11 @@ import copy
 import sys
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-from src.board import Board
-from src.validate import Validator
-from src.colors import WHITE,BLACK,RED,GREEN,REGION_COLORS
-
-from src.solve import Solver
-from src.deduce import Deducer
+from board import Board
+from validate import Validator
+from colors import WHITE,BLACK,RED,GREEN,REGION_COLORS
+from solve import Solver
+from deduce import Deducer
 
 
 
@@ -133,11 +132,22 @@ def main():
 
             # R - RESET
             # Q - QUIT
+            # U - Undo
+            
+            # Deduction:
             # D - INTERNAL OVERLAP
             # E - n REGIONS       
+            # C - Rol/col overlap 
+            # W - Sliding window
+            
             # A - FULL REDUCE
+            
+            # Solve:
             # F - FULL REDUCE -> BFOS
-            # C - Rol/col overlap             
+            # S - Brute Force
+            # O - BFOS
+            
+
             elif event.type == pygame.KEYDOWN:
 
                 if event.key == pygame.K_q:

@@ -1,6 +1,6 @@
 import json
 import pygame
-from src.colors import WHITE,BLACK,RED,GREEN,REGION_COLORS
+from colors import WHITE,BLACK,RED,GREEN,REGION_COLORS
 
 import copy
 

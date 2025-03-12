@@ -1,5 +1,5 @@
-from src.board import Board
-from src.validate import Validator
+from board import Board
+from validate import Validator
 import copy
 
 

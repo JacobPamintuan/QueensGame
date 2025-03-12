@@ -1,4 +1,4 @@
-from src.board import Board
+from board import Board
 import numpy as np
 
 class Validator:
