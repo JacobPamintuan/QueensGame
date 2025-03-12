@@ -12,7 +12,7 @@ from gui import GUI
 from r_solve import Solver
 
 
-MAPNUM = 18
+MAPNUM = 7
 ARCHIVE = False
 COLOR_PALETTE = "VIBRANT"
 

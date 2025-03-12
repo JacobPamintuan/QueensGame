@@ -132,6 +132,11 @@ class GUI:
 
                 win = validator.validate_win(board_data)
 
+
+
+            # U - Undo
+            # B - BRUTE FORCE
+            # O - BFOS
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_u:
                     if self.history:
@@ -144,6 +149,8 @@ class GUI:
 
                 if event.key == pygame.K_b:
                     win = solver.brute_force(board_data)
+                if event.key == pygame.K_o:
+                    win = solver.brute_force_optimal_seed(board_data)
                 
                 elif event.key == pygame.K_q:
                     return False, win
