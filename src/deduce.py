@@ -1,4 +1,4 @@
-from board import Board
+from src.board import Board
 import copy 
 
 from collections import defaultdict
@@ -83,7 +83,9 @@ class Deducer:
                 row_X_positions.append(self.get_X_positions(test_board))
                 test_board = copy.deepcopy(board)
 
-        common_row_coords = set.intersection(*row_X_positions)
+        common_row_coords = []
+        if row_X_positions:
+            common_row_coords = set.intersection(*row_X_positions)
 
         for row in range(board.size):
             if board.pieces[row][line] == 0:
@@ -91,10 +93,12 @@ class Deducer:
 
 
                 # Add positions that became an X after placing a queen
-                row_X_positions.append(self.get_X_positions(test_board))
+                row_Y_positions.append(self.get_X_positions(test_board))
                 test_board = copy.deepcopy(board)
 
-        common_col_coords = set.intersection(*row_X_positions)
+        common_col_coords = []
+        if row_Y_positions:
+            common_col_coords = set.intersection(*row_Y_positions)
 
 
         return common_row_coords, common_col_coords
@@ -152,7 +156,7 @@ class Deducer:
 
 
 
-    def region_line_deduction(self, board:Board):
+    def n_regions_line_deduction(self, board:Board):
         prev_board = copy.deepcopy(board)
 
 
@@ -190,7 +194,7 @@ class Deducer:
 
         #print()
         if board.pieces == prev_board.pieces:
-            print("NO FURTHER ROW/COL DEDUCTIONS")
+            print("NO FURTHER n REGION DEDUCTIONS")
             return False
         
         return True
@@ -218,13 +222,15 @@ class Deducer:
 
             # Run both functions on the board
             func1_changed = self.internal_overlap(board)  # Run first function
-            func2_changed = self.region_line_deduction(board)  # Run second function
+            func2_changed = self.n_regions_line_deduction(board)  # Run second function
+            func3_changed = self.row_col_overlap(board)
+
 
             self.place_last_piece(board)
 
 
             # If neither function caused a change in the board state, stop
-            if not func1_changed and not func2_changed:
+            if not func1_changed and not func2_changed and not func3_changed:
                 break  # No change, exit the loop
 
 

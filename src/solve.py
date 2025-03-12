@@ -1,7 +1,7 @@
-from board import Board
-from validate import Validator
+from src.board import Board
+from src.validate import Validator
 import copy
-import pdb
+
 
 class Solver:
     def __init__(self,validator : Validator):
@@ -88,8 +88,9 @@ class Solver:
 
         original = copy.deepcopy(board_data)
         
-
-        smalleset_region_id = min(board_data.region_dict, key=lambda k: len(board_data.region_dict[k]))
+        if board_data.region_dict:
+            smalleset_region_id = min(board_data.region_dict, key=lambda k: len(board_data.region_dict[k]))
+        else: return board_data
 
         for seed in board_data.region_dict[smalleset_region_id]:
 

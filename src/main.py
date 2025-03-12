@@ -2,13 +2,16 @@ import pygame
 import json
 import os
 import time
+import copy 
+import sys
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-from board import Board
-from validate import Validator
-from colors import WHITE,BLACK,RED,GREEN,REGION_COLORS
+from src.board import Board
+from src.validate import Validator
+from src.colors import WHITE,BLACK,RED,GREEN,REGION_COLORS
 
-from solve import Solver
-from deduce import Deducer
+from src.solve import Solver
+from src.deduce import Deducer
 
 
 
@@ -16,7 +19,6 @@ GRID_SIZE = 8
 CELL_SIZE = 60
 WINDOW_SIZE = GRID_SIZE * CELL_SIZE
 
-MAPNUM = 177#80 # 96 94
 
 
 pygame.init()
@@ -52,7 +54,7 @@ def get_board_data_archive(maps_file, mapNum: int):
 
     mapData = formatted_dict[mapNum]
     
-    name = f"Map No {mapData['id']} - {mapData['date']}"
+    name = f"Map No {mapData['id']}"# - {mapData['date']}"
     size = len(mapData['grid'][0])
     region_map = mapData['regions']
     
@@ -70,13 +72,14 @@ def load_board(board_data: Board):
     
               
 MAP_PATH = R"maps_data\archivedqueens.json"
-        
+MAPNUM = 173#80 # 96 94
+    
 
 def main():
     global GRID_SIZE, screen, regions, placed_queens, board, MAPNUM
     
     # board_data = get_board_data(MAPNUM)
-    board_data = get_board_data_archive(MAP_PATH, 315)
+    board_data = get_board_data_archive(MAP_PATH, MAPNUM)
     
     
     validator = Validator()
@@ -92,6 +95,8 @@ def main():
     
     win = False
 
+    history = []
+
     running = True
     while running:
         board_data.draw_board(screen, win)
@@ -104,6 +109,9 @@ def main():
             if event.type == pygame.QUIT:
                 running = False
             elif event.type == pygame.MOUSEBUTTONDOWN:
+
+                history.append(copy.deepcopy(board_data))
+
                 x,y = event.pos
 
                 col = x // CELL_SIZE
@@ -140,6 +148,9 @@ def main():
                     print("RESET")
                     win = False
 
+                if event.key == pygame.K_u:
+                    board_data = history.pop()
+
                 if event.key == pygame.K_d:                        
                     
                     start_time = time.time()
@@ -159,7 +170,7 @@ def main():
                 if event.key == pygame.K_c:
                     deducer.row_col_overlap(board_data)
                 if event.key == pygame.K_e:
-                    deducer.region_line_deduction(board_data)
+                    deducer.n_regions_line_deduction(board_data)
 
                 if event.key == pygame.K_a:                        
                     
@@ -179,7 +190,7 @@ def main():
                 if event.key == pygame.K_f:
                     start_time = time.time()
                     
-                    deducer.reduce_board_state(board_data)
+                    deducer.reduce_board_state(board_data)# if not win:
                     board_data = solver.brute_force_optimal_seed(board_data)
                     win = validator.validate_win(board_data)
 
