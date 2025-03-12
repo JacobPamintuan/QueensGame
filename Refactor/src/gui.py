@@ -110,7 +110,7 @@ class GUI:
                 return False, win
             elif event.type == pygame.MOUSEBUTTONDOWN:
 
-                self.history.append(board_data.copy())
+                self.history.append(board_data.copy_pieces())
 
                 x, y = event.pos
                 col = x // self.CELL_SIZE
@@ -143,7 +143,7 @@ class GUI:
                         print("Nothing to undo")
 
                 if event.key == pygame.K_b:
-                    solver.brute_force(board_data, self)
+                    win = solver.brute_force(board_data)
                 
                 elif event.key == pygame.K_q:
                     return False, win

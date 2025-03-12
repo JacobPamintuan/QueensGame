@@ -18,6 +18,9 @@ class Validator:
         rows_with_queens = set()
         cols_with_queens = set()
 
+        if board.is_empty():
+            return False
+
         for (row, col) in board.queens:
             if row in rows_with_queens or col in cols_with_queens:
                 print("Row/Col Conflict")

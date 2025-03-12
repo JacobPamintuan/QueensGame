@@ -22,15 +22,38 @@ class Board:
 
         return region_dict  # Return the constructed dictionary
     
-    def copy(self):
+
+    
+    def copy_pieces(self):
         queens_copy = deepcopy(self.queens)
         markers_copy = deepcopy(self.markers)
 
         return (queens_copy, markers_copy)
+    
+    def copy(self, new_state):
+        self.queens = deepcopy(new_state.queens)
+        self.markers = deepcopy(new_state.markers)
         
     def reset_board(self):
         self.queens = set()
         self.markers = set()
+        
+    def is_empty(self):
+        if not self.queens and not self.markers:
+            return True
+        return False
+        
+    def cell_is_queen(self, row, col):
+        return (row, col) in self.queens
+    
+    def cell_is_marker(self, row, col):
+        return (row, col) in self.markers
+    
+    def cell_is_empty(self, row, col):
+        if not self.cell_is_queen(row, col) and not self.cell_is_marker(row, col):
+            return True
+        return False
+    
         
     def place_queen(self, row, col):
         if 0 <= row < self.size and 0 <= col < self.size:

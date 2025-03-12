@@ -12,8 +12,8 @@ from gui import GUI
 from r_solve import Solver
 
 
-MAPNUM = 199
-ARCHIVE = True
+MAPNUM = 18
+ARCHIVE = False
 COLOR_PALETTE = "VIBRANT"
 
 def get_original_board_data(mapNum: int):
