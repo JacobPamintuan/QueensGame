@@ -312,7 +312,7 @@ class Deducer:
 
 
             # If neither function caused a change in the board state, stop
-            if not func1_changed and not func2_changed and not func3_changed:
+            if not func1_changed and not func2_changed and not func3_changed and func4_changed:
                 break  # No change, exit the loop
 
 
