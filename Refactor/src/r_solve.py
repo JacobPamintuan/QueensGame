@@ -81,13 +81,14 @@ class Solver:
         self.num_seeds = 0
         print("BRUTE FORCE OPTIMAL SEED")
         
-        original = copy.deepcopy(board)
+        # original_queens, original_markers = board.copy_pieces()
+
         
                 
         empty_cells = defaultdict(set)
         
         smalleset_region_id = -1
-        least_cell_count = 15*15
+        least_cell_count = 225 # 15 * 15
         
         for region_id, cells in board.region_dict.items():
             if len(cells) < least_cell_count:
@@ -95,7 +96,8 @@ class Solver:
                 smalleset_region_id = region_id
             
         empty_cells = board.region_dict[smalleset_region_id] - board.queens - board.markers
-        print(smalleset_region_id)
+        empty_cells = sorted(empty_cells)
+        #print(smalleset_region_id)
 
         for (row, col) in empty_cells:
             

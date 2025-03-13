@@ -1,5 +1,8 @@
 import os
 import sys
+import time
+import json
+import csv
 
 # Correcting paths to point inside QueensGame/
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), 'src')))
@@ -10,8 +13,6 @@ print("Updated sys.path:")
 for p in sys.path:
     print(p)
 
-import time
-import json
 from src.solve import Solver as Solver_SRC
 from Refactor.src.r_solve import Solver as Solver_Refactor
 from src.board import Board
@@ -72,6 +73,9 @@ def run_bfos_test(mapNum: int,
     chosen_seed_refactor = solver_refactor.chosen_seed
     print(f"Refactor/src BFOS Time: {elapsed_refactor:.6f}s, Solved: {solved_refactor}, Seeds Attempted: {num_seeds_refactor}, Chosen Seed: {chosen_seed_refactor}")
 
+    # Check if the chosen seeds are the same
+    chosen_seed_same = chosen_seed_src == chosen_seed_refactor
+
     return {
         "mapNum": mapNum,
         "src_time": elapsed_src,
@@ -81,12 +85,12 @@ def run_bfos_test(mapNum: int,
         "src_seeds": num_seeds_src,
         "refactor_seeds": num_seeds_refactor,
         "src_chosen_seed": chosen_seed_src,
-        "refactor_chosen_seed": chosen_seed_refactor
+        "refactor_chosen_seed": chosen_seed_refactor,
+        "chosen_seed_same": chosen_seed_same  # New key to track if seeds are the same
     }
 
 # Write the results to a CSV file
 def write_results_to_csv(results, filename="autotest_results.csv"):
-    import csv
     with open(filename, mode="w", newline="") as file:
         writer = csv.writer(file)
         header = [
@@ -94,18 +98,21 @@ def write_results_to_csv(results, filename="autotest_results.csv"):
             "src Time (s)", "Refactor/src Time (s)", 
             "src Solved", "Refactor/src Solved", 
             "src Seeds Attempted", "Refactor/src Seeds Attempted", 
-            "src Chosen Seed", "Refactor/src Chosen Seed"
+            "src Chosen Seed", "Refactor/src Chosen Seed",
+            "Chosen Seed Same"  # New column for seed comparison
         ]
         writer.writerow(header)
         for result in results:
-            writer.writerow([
+            writer.writerow([ 
                 result["mapNum"], 
                 result["src_time"], result["refactor_time"], 
                 result["src_solved"], result["refactor_solved"], 
                 result["src_seeds"], result["refactor_seeds"], 
-                result["src_chosen_seed"], result["refactor_chosen_seed"]
+                result["src_chosen_seed"], result["refactor_chosen_seed"],
+                result["chosen_seed_same"]  # Write the value for the seed comparison
             ])
     print(f"Results saved to {filename}")
+
 def main():
     # Define the range of maps to test
     results = []
@@ -115,7 +122,7 @@ def main():
         board_refactor = get_board_data_refactor(mapNum)
         
         validator_src = Validator()
-        validaotr_refactor = Validator_Refactor()
+        validator_refactor = Validator_Refactor()
 
         deducer_src = Deducer()
 
@@ -124,8 +131,16 @@ def main():
         solver_refactor = Solver_Refactor()
 
         # Run BFOS on both versions
-        result = run_bfos_test(mapNum, board_src, board_refactor, solver_src, solver_refactor, validator_src, validaotr_refactor, deducer_src)
+        result = run_bfos_test(mapNum, board_src, board_refactor, solver_src, solver_refactor, validator_src, validator_refactor, deducer_src)
         results.append(result)
+
+        filename = r"autotest_results.csv"
+
+        try:
+            write_results_to_csv(results)
+        except PermissionError:
+            print(f"Warning: Could not save file {filename}. The file might be open. Skipping save...")
+
 
     # Write results to CSV
     write_results_to_csv(results)

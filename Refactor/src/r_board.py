@@ -125,7 +125,7 @@ class Board:
     def algo_autofill_queen(self, queen_row, queen_col):
         self.place_queen(queen_row, queen_col)
         
-        new_markers = set()
+        # new_markers = set()
 
         region_id = self.region_map[queen_row][queen_col]
 
@@ -133,14 +133,14 @@ class Board:
             if (row, queen_col) in self.markers or row == queen_row:
                 continue
 
-            new_markers.add((row, queen_col))
+            # new_markers.add((row, queen_col))
             self.place_marker(row, queen_col)
 
         for col in range(self.size):
             if (queen_row, col) in self.markers or col == queen_col:
                 continue
 
-            new_markers.add((queen_row, col))
+            # new_markers.add((queen_row, col))
             self.place_marker(queen_row, col)
 
         for r_offset, c_offset in [(-1, -1), (-1, 1), (1, -1), (1, 1)]:
@@ -152,15 +152,15 @@ class Board:
 
             self.place_marker(n_row, n_col)
 
-            if 0 <= n_row < self.size and 0 <= n_col < self.size:
-                new_markers.add((n_row, n_col))
+            # if 0 <= n_row < self.size and 0 <= n_col < self.size:
+            #     new_markers.add((n_row, n_col))
 
         for row, col in self.region_dict[region_id]:
             if (row, col) in self.markers: continue
             if row == queen_row and col == queen_col: continue
 
             self.place_marker(row, col)
-            new_markers.add((row,col))
+            # new_markers.add((row,col))
 
 
-        return new_markers
+        # return new_markers
