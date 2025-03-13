@@ -151,8 +151,13 @@ class GUI:
 
                 if event.key == pygame.K_b:
                     win = solver.brute_force(board_data)
+                    if not win:
+                        print("NO SOLUTION FOUND FROM CURRENT BOARD STATE")
+                        
                 if event.key == pygame.K_o:
                     win = solver.brute_force_optimal_seed(board_data)
+                    if not win:
+                        print("NO SOLUTION FOUND FROM CURRENT BOARD STATE")
 
                 if event.key == pygame.K_d:
                     deducer.reduce_board(board_data)

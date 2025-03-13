@@ -18,12 +18,12 @@ class Deducer:
 
             for (row, col) in available_cells:
                 regional_overlaps.append(board.hypothetical_autofill(row, col))
-
-            regional_overlaps = set.intersection(*regional_overlaps)
+            if regional_overlaps:
+                regional_overlaps = set.intersection(*regional_overlaps)
 
             # print(f"Region {region_id}: {regional_overlaps}")
-           
-            overlaps = overlaps.union(regional_overlaps)
+            if regional_overlaps:
+                overlaps = overlaps.union(regional_overlaps)
 
         overlaps = overlaps - board.queens
         for (row, col) in overlaps:
