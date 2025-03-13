@@ -25,8 +25,8 @@ class Solver:
                     
                     temp_queen, temp_marker = board.copy_pieces()
                     
-                    # board.algo_autofill_queen(row, col)
-                    board.player_autofill_queen(row, col)
+                    board.algo_autofill_queen(row, col)
+                    # board.player_autofill_queen(row, col)
                     # gui.draw(board, False)
                     
                     if self.brute_force_helper(board, gui):
@@ -59,8 +59,8 @@ class Solver:
                     self.num_seeds += 1
                     
                     attempt_board = copy.deepcopy(board)
-                    # attempt_board.algo_autofill_queen(row,col)
-                    attempt_board.player_autofill_queen(row,col)
+                    attempt_board.algo_autofill_queen(row,col)
+                    # attempt_board.player_autofill_queen(row,col)
                     
                     if self.brute_force_helper(attempt_board, gui):
                         board.copy(attempt_board)
@@ -106,8 +106,8 @@ class Solver:
                 self.num_seeds += 1
                 
                 attempt_board = copy.deepcopy(board)
-                # attempt_board.algo_autofill_queen(row,col)
-                attempt_board.player_autofill_queen(row,col)
+                attempt_board.algo_autofill_queen(row,col)
+                # attempt_board.player_autofill_queen(row,col)
                 
                 if self.brute_force_helper(attempt_board, gui):
                     board.copy(attempt_board)
