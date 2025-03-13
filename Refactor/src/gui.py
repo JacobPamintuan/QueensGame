@@ -16,7 +16,7 @@ from r_solve import Solver
 from r_deduce import Deducer
 
 class GUI:
-    def __init__(self, grid_size, cell_size, color_palette_name):
+    def __init__(self, caption, grid_size, cell_size, color_palette_name):
         self.GRID_SIZE = grid_size
         self.CELL_SIZE = cell_size
         self.WINDOW_SIZE = self.GRID_SIZE * self.CELL_SIZE
@@ -24,7 +24,7 @@ class GUI:
         self.color_palette = colors["REGION_COLORS"][color_palette_name]
 
         self.screen = pygame.display.set_mode((self.WINDOW_SIZE, self.WINDOW_SIZE))
-        pygame.display.set_caption("Queen's Game")
+        pygame.display.set_caption(caption)
         
 
         self.history = []

@@ -31,13 +31,47 @@ class Deducer:
 
 
         return
-        
+    
+
+    def row_col_overlap(self, board: Board):
+        overlaps = set()
+
+        for line in range(board.size):
+            row_X_positions = []
+            col_X_positions = []
+
+            for col in range(board.size):
+                if board.cell_is_empty(line, col):
+                    row_X_positions.append(board.hypothetical_autofill(line,col))
+            common_row_markers = set()
+            if row_X_positions:
+                common_row_markers = set.intersection(*row_X_positions)
+
+
+            for row in range(board.size):
+                if board.cell_is_empty(row,line):
+                    col_X_positions.append(board.hypothetical_autofill(row, line))
+            common_col_makers = set()
+            if col_X_positions:
+                common_col_makers = set.intersection(*col_X_positions)
+
+            overlaps = overlaps | common_row_markers | common_col_makers
+            
+    
+        overlaps = overlaps - board.queens
+
+        for (row, col) in overlaps:
+            board.place_marker(row, col)
+
+
+        return
 
 
     def reduce_board(self, board : Board):
 
         start = time.time()
         self.internal_overlap(board)
+        self.row_col_overlap(board)
         elapsed = time.time() - start
         print(f"Deduction took {elapsed:.4f} seconds")
 

@@ -12,8 +12,10 @@ from gui import GUI
 from r_solve import Solver
 from r_deduce import Deducer
 
+# Testing Iinternal_overlap: 287
+# Testing row_col_overlap: 179, 203, 180, 269
 
-MAPNUM = 287
+MAPNUM = 269
 ARCHIVE = True
 COLOR_PALETTE = "VIBRANT"
 
@@ -54,8 +56,13 @@ def get_archive_board_data(mapNum: int):
         raise ValueError(f"Map {mapNum} not found in the dataset.") 
 
     mapData = formatted_dict[mapNum]
-    
+
     name = f"Map No {mapData['id']}"# - {mapData['date']}"
+
+    date = mapData.get('date', None)
+    if date:
+        name = f"Map {mapData['id']} - {mapData['date']}"
+
     size = len(mapData['grid'][0])
     region_map = mapData['regions']
     
@@ -76,9 +83,10 @@ def main():
     solver = Solver()
     deducer = Deducer()
 
-    gui = GUI(grid_size=board_data.size, cell_size=60,color_palette_name=COLOR_PALETTE)
+    caption = f"(Refactored) Queen's Game: {board_data.name}"
+    gui = GUI(caption, grid_size=board_data.size, cell_size=60,color_palette_name=COLOR_PALETTE)
     load_board(board_data, gui)
-    pygame.display.set_caption(f"Queen's Game - {board_data.name}")
+    # pygame.display.set_caption(f"Queen's Game - {board_data.name}")
 
     print(f"{board_data.name}")
     win = False
