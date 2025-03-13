@@ -164,3 +164,37 @@ class Board:
 
 
         # return new_markers
+
+    def hypothetical_autofill(self, queen_row, queen_col):
+        hyp_markers = set()
+
+         # Optionally get the region ID if needed (not used in this code)
+        region_id = self.region_map[queen_row][queen_col]
+        
+       
+        # Process the queen's column: For every row except queen_row,
+        # remove any queen (if present) and place a marker.
+        for row in range(self.size):
+            if row != queen_row:
+                hyp_markers.add((row, queen_col))  # Place marker in this cell
+        
+        # Process the queen's row: For every column except queen_col,
+        # remove any queen (if present) and place a marker.
+        for col in range(self.size):
+            if col != queen_col:
+                hyp_markers.add((queen_row, col))
+
+        for r_offset, c_offset in [(-1, -1), (-1, 1), (1, -1), (1, 1)]:
+
+            n_row = queen_row + r_offset
+            n_col = queen_col + c_offset
+
+            if 0 <= n_row < self.size and 0 <= n_col < self.size:
+                hyp_markers.add((n_row,n_col))
+
+        for row, col in self.region_dict[region_id]:
+            if row == queen_row and col == queen_col:
+                continue
+            hyp_markers.add((row,col))
+        
+        return hyp_markers

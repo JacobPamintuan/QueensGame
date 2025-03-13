@@ -10,10 +10,11 @@ from r_board import Board
 from r_validation import Validator
 from gui import GUI
 from r_solve import Solver
+from r_deduce import Deducer
 
 
-MAPNUM = 7
-ARCHIVE = False
+MAPNUM = 287
+ARCHIVE = True
 COLOR_PALETTE = "VIBRANT"
 
 def get_original_board_data(mapNum: int):
@@ -73,7 +74,7 @@ def main():
     assert board_data, "BOARD DATA COULD NOT BE LOADED"
     validator = Validator()
     solver = Solver()
-    # deducer = Deducer()
+    deducer = Deducer()
 
     gui = GUI(grid_size=board_data.size, cell_size=60,color_palette_name=COLOR_PALETTE)
     load_board(board_data, gui)
@@ -84,7 +85,7 @@ def main():
     running = True
     while running:
         gui.draw(board_data, win)
-        running, win = gui.handle_events(board_data, validator,solver,win)
+        running, win = gui.handle_events(board_data, validator,solver,deducer, win)
 
         # Handle additional game logic like deductions, solving, etc.
         if not running:

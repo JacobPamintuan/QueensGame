@@ -13,6 +13,7 @@ from Refactor.data.r_colors import colors
 from r_board import Board
 from r_validation import Validator
 from r_solve import Solver
+from r_deduce import Deducer
 
 class GUI:
     def __init__(self, grid_size, cell_size, color_palette_name):
@@ -103,7 +104,7 @@ class GUI:
 
 
         
-    def handle_events(self, board_data : Board, validator : Validator, solver: Solver, win):
+    def handle_events(self, board_data: Board, validator: Validator, solver: Solver, deducer: Deducer, win: bool):
         
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -137,6 +138,7 @@ class GUI:
             # U - Undo
             # B - BRUTE FORCE
             # O - BFOS
+            # D - Deduce
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_u:
                     if self.history:
@@ -151,6 +153,9 @@ class GUI:
                     win = solver.brute_force(board_data)
                 if event.key == pygame.K_o:
                     win = solver.brute_force_optimal_seed(board_data)
+
+                if event.key == pygame.K_d:
+                    deducer.reduce_board(board_data)
                 
                 elif event.key == pygame.K_q:
                     return False, win
