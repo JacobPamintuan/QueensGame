@@ -182,6 +182,16 @@ class GUI:
                     print(f"FULL DEDUCTION took {elapsed:.6f} seconds")
                     win = validator.validate_win(board_data)
                 
+                if event.key == pygame.K_s:
+                    start = time.time()
+                    deducer.full_reduce_board(board_data)
+                    
+                    win = solver.brute_force_optimal_seed(board_data)
+                    elapsed = time.time() - start
+
+
+                    print(f"DEDUCTION + BFOS took {elapsed:.6f} seconds")
+                    
                 elif event.key == pygame.K_q:
                     return False, win
                 elif event.key == pygame.K_r:

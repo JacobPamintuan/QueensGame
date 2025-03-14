@@ -41,7 +41,8 @@ class Solver:
     def brute_force(self, board: Board, gui=None):
         """ Initiates brute force solving. """
         
-
+        if self.validator.validate_win(board):
+            return True
 
 
         self.num_seeds = 0
@@ -75,7 +76,8 @@ class Solver:
     def brute_force_optimal_seed(self, board: Board, gui=None):
         """ Initiates brute force solving. """
         
-
+        if self.validator.validate_win(board):
+            return True
 
 
         self.num_seeds = 0
