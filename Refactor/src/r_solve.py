@@ -90,13 +90,13 @@ class Solver:
         smalleset_region_id = -1
         least_cell_count = 225 # 15 * 15
         
-        for region_id, cells in board.region_dict.items():
+        for region_id, cells in board.regions_dict.items():
             empty_region_cells = cells - board.queens - board.markers
             if empty_region_cells and len(empty_region_cells) < least_cell_count:
                 least_cell_count = len(empty_region_cells)
                 smalleset_region_id = region_id
             
-        empty_cells = board.region_dict[smalleset_region_id] - board.queens - board.markers
+        empty_cells = board.regions_dict[smalleset_region_id] - board.queens - board.markers
         empty_cells = sorted(empty_cells)
 
 

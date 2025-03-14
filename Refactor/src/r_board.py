@@ -9,7 +9,7 @@ class Board:
         self.queens = set()
         self.markers = set()
 
-        self.region_dict = self.set_region_dict()
+        self.regions_dict = self.set_region_dict()
 
     # def set_region_dict(self):
     #     """Creates and returns a dictionary mapping region IDs to their (row, col) coordinates."""
@@ -83,6 +83,8 @@ class Board:
 
     def player_autofill_queen(self, queen_row, queen_col):
 
+
+        
         # Optionally get the region ID if needed (not used in this code)
         region_id = self.region_map[queen_row][queen_col]
         
@@ -111,7 +113,7 @@ class Board:
             self.remove_queen(n_row, n_col)
             self.place_marker(n_row, n_col)
 
-        for row, col in self.region_dict[region_id]:
+        for row, col in self.regions_dict[region_id]:
             self.remove_queen(row,col)
             self.place_marker(row,col)
         
@@ -155,7 +157,7 @@ class Board:
             # if 0 <= n_row < self.size and 0 <= n_col < self.size:
             #     new_markers.add((n_row, n_col))
 
-        for row, col in self.region_dict[region_id]:
+        for row, col in self.regions_dict[region_id]:
             if (row, col) in self.markers: continue
             if row == queen_row and col == queen_col: continue
 
@@ -192,7 +194,7 @@ class Board:
             if 0 <= n_row < self.size and 0 <= n_col < self.size:
                 hyp_markers.add((n_row,n_col))
 
-        for row, col in self.region_dict[region_id]:
+        for row, col in self.regions_dict[region_id]:
             if row == queen_row and col == queen_col:
                 continue
             hyp_markers.add((row,col))

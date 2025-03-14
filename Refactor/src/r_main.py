@@ -15,7 +15,7 @@ from r_deduce import Deducer
 # Testing Iinternal_overlap: 287
 # Testing row_col_overlap: 179, 203, 180, 269
 
-MAPNUM = 269
+MAPNUM = 315
 ARCHIVE = True
 COLOR_PALETTE = "VIBRANT"
 

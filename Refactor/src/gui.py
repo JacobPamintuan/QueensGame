@@ -139,6 +139,8 @@ class GUI:
             # B - BRUTE FORCE
             # O - BFOS
             # D - Deduce
+            # F - Full Deduce
+            # S - Solve: Full Deduce -> BFOS
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_u:
                     if self.history:
@@ -160,7 +162,25 @@ class GUI:
                         print("NO SOLUTION FOUND FROM CURRENT BOARD STATE")
 
                 if event.key == pygame.K_d:
-                    deducer.reduce_board(board_data)
+
+                    start = time.time()
+                    deducer.step_reduce_board(board_data)
+                    elapsed = time.time() - start
+
+                    win = validator.validate_win(board_data)
+
+                    print(f"STEP DEDUCTION took {elapsed:.6f} seconds")
+
+                if event.key == pygame.K_f:
+
+                    start = time.time()
+                    deducer.full_reduce_board(board_data)
+                    elapsed = time.time() - start
+
+                    win = validator.validate_win(board_data)
+
+                    print(f"FULL DEDUCTION took {elapsed:.6f} seconds")
+                    win = validator.validate_win(board_data)
                 
                 elif event.key == pygame.K_q:
                     return False, win
