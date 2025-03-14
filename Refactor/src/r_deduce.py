@@ -27,7 +27,7 @@ class Deducer:
             if regional_overlaps:
                 overlaps = overlaps.union(regional_overlaps)
 
-        overlaps = overlaps - board.queens
+        overlaps = overlaps - board.queens - board.markers
 
         if overlaps:
             for (row, col) in overlaps:
@@ -65,7 +65,7 @@ class Deducer:
             overlaps = overlaps | common_row_markers | common_col_makers
             
     
-        overlaps = overlaps - board.queens
+        overlaps = overlaps - board.queens - board.markers
 
         if overlaps:
             for (row, col) in overlaps:
