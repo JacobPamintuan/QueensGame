@@ -12,27 +12,38 @@ from r_board import Board
 from r_validation import Validator
 from r_solve import Solver
 from r_deduce import Deducer
+from r_main import update_archive
 
 # Paths to JSON files
 MAPS_FILE_ORIGINAL = "maps_data/maps.json"
 MAPS_FILE_ARCHIVE = "maps_data/archivedqueens.json"
 
-def load_map_ids(maps_file):
-    """Loads all map IDs from the JSON file dynamically."""
-    with open(maps_file, "r") as file:
-        data = json.load(file)  # Load JSON list
-    
-    return [entry['id'] for entry in data]  # Extract all map IDs
-
-def get_board_data(maps_file, mapNum: int, is_archive=False):
-    """Retrieves board data for a given mapNum from the JSON file."""
+def load_map_data(maps_file):
+    """Loads all map data from the JSON file into memory."""
     with open(maps_file, "r") as file:
         data = json.load(file)
+    return data
+
+# Load the map data once at the beginning
+original_data = load_map_data(MAPS_FILE_ORIGINAL)
+archive_data = load_map_data(MAPS_FILE_ARCHIVE)
+
+def load_map_ids(data):
+    """Loads all map IDs from the given data."""
     
+    update_archive()
+    
+    if isinstance(data, list):  # If the data is a list of maps
+        return [entry['id'] for entry in data]
+    else:  # Assuming the data is a dict for the original dataset
+        return list(data.keys())  # Using keys (map IDs)
+
+def get_board_data(data, mapNum: int, is_archive=False):
+    """Retrieves board data for a given mapNum from the loaded data."""
     if is_archive:
         formatted_dict = {entry['id']: entry for entry in data}
         if mapNum not in formatted_dict:
-            raise ValueError(f"Map {mapNum} not found in {maps_file}")
+            raise ValueError(f"Map {mapNum} not found in archive data")
         mapData = formatted_dict[mapNum]
         name = f"Map No {mapData['id']}"
         size = len(mapData['grid'])
@@ -60,7 +71,7 @@ class TestOriginal(unittest.TestCase):
     """Tests for the original dataset."""
     
     def _test_OG(self, mapNum):
-        board = get_board_data(MAPS_FILE_ORIGINAL, mapNum)
+        board = get_board_data(original_data, mapNum)
         validator = Validator()
         solver = Solver()
         deducer = Deducer()
@@ -81,7 +92,7 @@ class TestArchive(unittest.TestCase):
     """Tests for the archived dataset."""
     
     def _test_ARCH(self, mapNum):
-        board = get_board_data(MAPS_FILE_ARCHIVE, mapNum, is_archive=True)
+        board = get_board_data(archive_data, mapNum, is_archive=True)
         validator = Validator()
         solver = Solver()
         deducer = Deducer()
@@ -93,7 +104,7 @@ class TestArchive(unittest.TestCase):
         self.assertTrue(solved, f"Algorithm BFOS failed on Map {mapNum} (Time: {elapsed_time:.4f}s)")
 
 # Load map IDs dynamically for the archived dataset
-MAP_IDS = load_map_ids(MAPS_FILE_ARCHIVE)
+MAP_IDS = load_map_ids(archive_data)
 for mapNum in MAP_IDS:
     def test_method(self, mapNum=mapNum):
         self._test_ARCH(mapNum)

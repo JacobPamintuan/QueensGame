@@ -1,6 +1,7 @@
 import pygame
 import os
 import json
+import requests
 
 import sys
 sys.path.append('../data')
@@ -15,15 +16,43 @@ from r_deduce import Deducer
 # Testing Iinternal_overlap: 287
 # Testing row_col_overlap: 179, 203, 180, 269
 
-MAPNUM = 315
+MAPNUM = 318
 ARCHIVE = True
 COLOR_PALETTE = "VIBRANT"
+
+def update_archive():
+    req = requests.get("https://queensstorage.blob.core.windows.net/puzzles/linkedinPuzzles.json")
+    
+    data = req.json()
+    
+    
+    
+    
+    formatted_dict = {entry['id']: entry for entry in data}
+    
+    formatted_dict[177]['regions'][6][7] = 9
+    formatted_dict[177]['regions'][6][8] = 9
+    formatted_dict[177]['regions'][7][7] = 9
+    formatted_dict[177]['regions'][7][8] = 9
+    
+    script_dir = os.path.dirname(os.path.abspath(__file__))  
+    # maps_file = os.path.join(script_dir, '../data/archivedqueens.json')
+    maps_file = os.path.join(script_dir, '../../maps_data/archivedqueens.json')
+    # maps_file = os.path.join(script_dir, '../../maps_data/test.json')
+    
+    with open(maps_file, 'w') as file:
+        json.dump(list(formatted_dict.values()), file, indent=4)
+    
+    return
+    
+    
 
 def get_original_board_data(mapNum: int):
     
     key = f"map{mapNum}"
     script_dir = os.path.dirname(os.path.abspath(__file__))  
-    maps_file = os.path.join(script_dir, '../data/maps.json')
+    # maps_file = os.path.join(script_dir, '../data/maps.json')
+    maps_file = os.path.join(script_dir, '../../maps_data/maps.json')
     
     if mapNum not in range(1,101):
         print(f"Invalid Map Number for {maps_file}")
@@ -37,9 +66,11 @@ def get_original_board_data(mapNum: int):
     return Board(mapData['name'], mapData['caseNumber'], mapData['colorGrid'])
 
 def get_archive_board_data(mapNum: int):
-
+    
     script_dir = os.path.dirname(os.path.abspath(__file__))  
-    maps_file = os.path.join(script_dir, '../data/archivedqueens.json')
+    # maps_file = os.path.join(script_dir, '../data/archivedqueens.json')
+    maps_file = os.path.join(script_dir, '../../maps_data/archivedqueens.json')
+    # maps_file = os.path.join(script_dir, '../../maps_data/test.json')
 
     try:
         with open(maps_file, "r") as file:
@@ -74,6 +105,7 @@ def load_board(board_data: Board, gui: GUI):
 def main():
     # MAPNUM =   # Or change to your desired map number
     if ARCHIVE:
+        update_archive()
         board_data = get_archive_board_data(MAPNUM)
     else:
         board_data = get_original_board_data(MAPNUM)
