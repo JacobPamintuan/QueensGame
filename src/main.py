@@ -12,12 +12,15 @@ from gui import GUI
 from solve import Solver
 from deduce import Deducer
 
-# Testing Iinternal_overlap: 287
+# Testing Internal_overlap: 287
 # Testing row_col_overlap: 179, 203, 180, 269
 
 MAPNUM = 323
 ARCHIVE = True
 COLOR_PALETTE = "VIBRANT"
+
+MAPS_FILE_ORIGINAL = "data/maps.json"
+MAPS_FILE_ARCHIVE = "data/archivedqueens.json"
 
 def update_archive():
     try:
@@ -35,16 +38,28 @@ def update_archive():
         formatted_dict[177]['regions'][7][7] = 9
         formatted_dict[177]['regions'][7][8] = 9
         
-        script_dir = os.path.dirname(os.path.abspath(__file__))  
-        # maps_file = os.path.join(script_dir, '../data/archivedqueens.json')
-        maps_file = os.path.join(script_dir, '../../maps_data/archivedqueens.json')
-        # maps_file = os.path.join(script_dir, '../../maps_data/test.json')
+        # script_dir = os.path.dirname(os.path.abspath(__file__))  
+        # # maps_file = os.path.join(script_dir, '../data/archivedqueens.json')
+        # maps_file = os.path.join(script_dir, '../../maps_data/archivedqueens.json')
+        # # maps_file = os.path.join(script_dir, '../../maps_data/test.json')
         
-        with open(maps_file, 'w') as file:
+        with open(MAPS_FILE_ARCHIVE, 'w') as file:
             json.dump(list(formatted_dict.values()), file, indent=4)
             
         print("ARCHIVE UPDATED")
-    except:
+    except requests.exceptions.RequestException as e:
+        # Issues with the GET request
+        print(f"Request failed: {e}")
+        return False
+
+    except FileNotFoundError as e:
+        # File path doesn't exist
+        print(f"File not found: {e}")
+        return False
+
+    except Exception as e:
+        # General exception handler 
+        print(f"An unexpected error occurred: {e}")
         return False
     
     return True
@@ -53,15 +68,13 @@ def update_archive():
 def get_original_board_data(mapNum: int):
     
     key = f"map{mapNum}"
-    script_dir = os.path.dirname(os.path.abspath(__file__))  
-    # maps_file = os.path.join(script_dir, '../data/maps.json')
-    maps_file = os.path.join(script_dir, '../../maps_data/maps.json')
+
     
     if mapNum not in range(1,101):
-        print(f"Invalid Map Number for {maps_file}")
+        print(f"Invalid Map Number for {MAPS_FILE_ORIGINAL}")
         return None
 
-    with open(maps_file, "r") as file:
+    with open(MAPS_FILE_ORIGINAL, "r") as file:
         data = json.load(file)
         
     mapData = data[key]
@@ -69,17 +82,12 @@ def get_original_board_data(mapNum: int):
     return Board(mapData['name'], mapData['caseNumber'], mapData['colorGrid'])
 
 def get_archive_board_data(mapNum: int):
-    
-    script_dir = os.path.dirname(os.path.abspath(__file__))  
-
-    maps_file = os.path.join(script_dir, r'..\data\archivedqueens.json')
-
 
     try:
-        with open(maps_file, "r") as file:
+        with open(MAPS_FILE_ARCHIVE, "r") as file:
             data = json.load(file)
     except FileNotFoundError:
-        raise FileNotFoundError(f"The file {maps_file} was not found.")
+        raise FileNotFoundError(f"The file {MAPS_FILE_ARCHIVE} was not found.")
     except json.JSONDecodeError:
         raise ValueError("Error decoding the JSON file.")
         
@@ -91,8 +99,8 @@ def get_archive_board_data(mapNum: int):
 
     mapData = formatted_dict[mapNum]
 
-    name = f"Map No {mapData['id']}"# - {mapData['date']}"
-
+    name = f"Map No {mapData['id']}"
+    
     date = mapData.get('date', None)
     if date:
         name = f"Map {mapData['id']} - {mapData['date']}"
@@ -106,7 +114,7 @@ def load_board(board_data: Board, gui: GUI):
     gui.update_window_size(board_data.size)
 
 def main():
-    # MAPNUM =   # Or change to your desired map number
+
     if ARCHIVE:
         update_archive()
         board_data = get_archive_board_data(MAPNUM)
@@ -118,10 +126,10 @@ def main():
     solver = Solver()
     deducer = Deducer()
 
-    caption = f"(Refactored) Queen's Game: {board_data.name}"
+    caption = f"Queen's Game: {board_data.name}"
     gui = GUI(caption, grid_size=board_data.size, cell_size=60,color_palette_name=COLOR_PALETTE)
     load_board(board_data, gui)
-    # pygame.display.set_caption(f"Queen's Game - {board_data.name}")
+
 
     print(f"{board_data.name}")
     win = False
@@ -134,8 +142,6 @@ def main():
         if not running:
             break
 
-        # Your additional logic for solving, deduction, etc.
-        # Example: Deduction, Brute force solving, etc.
 
     pygame.quit()
 
