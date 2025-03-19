@@ -9,11 +9,11 @@ import sys
 sys.path.append('../data')
 sys.path.append('.')
 
-from Refactor.data.r_colors import colors
-from r_board import Board
-from r_validation import Validator
-from r_solve import Solver
-from r_deduce import Deducer
+from colors import colors
+from board import Board
+from validation import Validator
+from solve import Solver
+from deduce import Deducer
 
 class GUI:
     def __init__(self, caption, grid_size, cell_size, color_palette_name):

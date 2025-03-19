@@ -1,124 +1,126 @@
 from board import Board
-from validate import Validator
+from validation import Validator
 import copy
-
+from collections import defaultdict
 
 class Solver:
-    def __init__(self,validator : Validator):
-        self.validator = validator
+    def __init__(self):
+        self.validator = Validator()
         self.num_seeds = 0
-        self.chosen_seed = (-1,-1)
+        self.chosen_seed = (-1, -1)
 
-    def brute_force_helper(self, board_data : Board):
+    def brute_force_helper(self, board: Board, gui=None):
+        """ Recursively solves the board using brute force. """
 
-  
-        
+        # gui.draw(board,False)
 
-        if self.validator.validate_win(board_data):
+        # Base case: If the board is solved, return True
+        if self.validator.validate_win(board):
             return True
-        
-        for row in range(board_data.size):
-            for col in range(board_data.size):
-                if board_data.pieces[row][col] == 0:
 
-                    temp_pieces = copy.deepcopy(board_data.pieces)
-
-                    board_data.queen_autofill(row,col)
-
+        for row in range(board.size):
+            for col in range(board.size):
+                
+                if board.cell_is_empty(row, col):
                     
-                    if self.brute_force_helper(board_data):
+                    temp_queen, temp_marker = board.copy_pieces()
+                    
+                    board.algo_autofill_queen(row, col)
+                    # board.player_autofill_queen(row, col)
+                    # gui.draw(board, False)
+                    
+                    if self.brute_force_helper(board, gui):
                         return True
                     
                     else:
-                        board_data.pieces = copy.deepcopy(temp_pieces)
+                        board.queens, board.markers = temp_queen, temp_marker
+                        board.place_marker(row, col)
+                        
+                        return self.brute_force_helper(board,gui)
 
+    def brute_force(self, board: Board, gui=None):
+        """ Initiates brute force solving. """
+        
+        if self.validator.validate_win(board):
+            return True
 
-                        board_data.place_piece(row,col,-1)
-                        return self.brute_force_helper(board_data)
-
-
-
-
-        return False
-
-        # board_data.queen_autofill(1,1)
-
-    def brute_force(self, board_data : Board):
 
         self.num_seeds = 0
-
         print("BRUTE FORCE")
         
-        original = copy.deepcopy(board_data)
-        
-        
-        for row in range(board_data.size):
-            for col in range(board_data.size):
-                
-                if board_data.pieces[row][col] == 0:
+        original = copy.deepcopy(board)
 
+        
+        for row in range(board.size):
+            for col in range(board.size):
+                
+                if board.cell_is_empty(row, col):
+                    
                     print(f"ATTEMPTING SEED: [{row}][{col}]")
                     self.num_seeds += 1
-
-
-
-                    temp = copy.deepcopy(board_data)
                     
-                    temp.queen_autofill(row,col)
-
-                    attempt = self.brute_force_helper(temp)
-
-
-
-                    if attempt:
-                        board_data = copy.deepcopy(temp)
-
-                        self.chosen_seed = (row,col)
-
-                        return board_data
-                
-        print("No Solution found")
-        return original
+                    attempt_board = copy.deepcopy(board)
+                    attempt_board.algo_autofill_queen(row,col)
+                    # attempt_board.player_autofill_queen(row,col)
+                    
+                    if self.brute_force_helper(attempt_board, gui):
+                        board.copy(attempt_board)
+                        
+                        self.chosen_seed = (row, col)
+                        
+                        return True
+                    
+        return False
     
-    def brute_force_optimal_seed(self, board_data : Board):
+    
+    def brute_force_optimal_seed(self, board: Board, gui=None):
+        """ Initiates brute force solving. """
+        
+        if self.validator.validate_win(board):
+            return True
+
 
         self.num_seeds = 0
-
         print("BRUTE FORCE OPTIMAL SEED")
-
-        original = copy.deepcopy(board_data)
         
-        if board_data.region_dict:
-            smalleset_region_id = min(board_data.region_dict, key=lambda k: len(board_data.region_dict[k]))
-        else: return board_data
+        # original_queens, original_markers = board.copy_pieces()
 
-        for seed in board_data.region_dict[smalleset_region_id]:
+        
+                
+        empty_cells = defaultdict(set)
+        
+        smalleset_region_id = -1
+        least_cell_count = 225 # 15 * 15
+        
+        for region_id, cells in board.regions_dict.items():
+            empty_region_cells = cells - board.queens - board.markers
+            if empty_region_cells and len(empty_region_cells) < least_cell_count:
+                least_cell_count = len(empty_region_cells)
+                smalleset_region_id = region_id
+            
+        empty_cells = board.regions_dict[smalleset_region_id] - board.queens - board.markers
+        empty_cells = sorted(empty_cells)
 
 
-            row, col = seed
+        print(f"SEARCHING REGION: {smalleset_region_id}")
 
-            if board_data.pieces[row][col] == 0 or board_data.pieces[row][col] == 1:
-
+        for (row, col) in empty_cells:
+            
+            
+            if board.cell_is_empty(row, col):
+                
                 print(f"ATTEMPTING SEED: [{row}][{col}]")
                 self.num_seeds += 1
-
-
-                temp = copy.deepcopy(board_data)
-
-                temp.queen_autofill(row, col)
-
-                attempt = self.brute_force_helper(temp)
-
-                if attempt:
-                    board_data = copy.deepcopy(temp)
-                    self.chosen_seed = seed
                 
-
-                    return board_data
+                attempt_board = copy.deepcopy(board)
+                attempt_board.algo_autofill_queen(row,col)
+                # attempt_board.player_autofill_queen(row,col)
                 
-        print("No Solution found")
-        return original
-
-
-        
-
+                if self.brute_force_helper(attempt_board, gui):
+                    board.copy(attempt_board)
+                    
+                    self.chosen_seed = (row, col)
+                    
+                    return True
+                    
+        return False

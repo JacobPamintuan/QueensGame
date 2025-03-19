@@ -5,18 +5,18 @@ import time
 import json
 
 # Add the 'src' directory to the system path
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'Refactor/src')))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'src')))
 
 # Import necessary modules
-from r_board import Board
-from r_validation import Validator
-from r_solve import Solver
-from r_deduce import Deducer
-from r_main import update_archive
+from board import Board
+from validation import Validator
+from solve import Solver
+from deduce import Deducer
+from main import update_archive
 
 # Paths to JSON files
-MAPS_FILE_ORIGINAL = "maps_data/maps.json"
-MAPS_FILE_ARCHIVE = "maps_data/archivedqueens.json"
+MAPS_FILE_ORIGINAL = "data/maps.json"
+MAPS_FILE_ARCHIVE = "data/archivedqueens.json"
 
 def load_map_data(maps_file):
     """Loads all map data from the JSON file into memory."""

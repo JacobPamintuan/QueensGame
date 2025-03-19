@@ -1,4 +1,4 @@
-from r_board import Board
+from board import Board
 
 class Validator:
     def __init__(self):

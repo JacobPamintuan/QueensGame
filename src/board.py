@@ -1,185 +1,202 @@
-import json
-import pygame
-from colors import WHITE,BLACK,RED,GREEN,REGION_COLORS
-
-import copy
-
-
+from copy import deepcopy
+from collections import defaultdict
 class Board:
     def __init__(self, name, size, region_map):
         self.name = name
         self.size = size
-        self.region_map = region_map
-        self.region_dict = self.set_region_dict()  # Now correctly initializes region_dict
-        self.pieces = [[0] * size for _ in range(size)]  # Cleaner initialization
+        self.region_map = region_map # Color / region ids
 
+        self.queens = set()
+        self.markers = set()
+
+        self.regions_dict = self.set_region_dict()
+
+    # def set_region_dict(self):
+    #     """Creates and returns a dictionary mapping region IDs to their (row, col) coordinates."""
+    #     region_dict = {}  # Initialize an empty dictionary
+
+    #     for row in range(self.size):
+    #         for col in range(self.size):
+    #             region_id = self.region_map[row][col]
+    #             region_dict.setdefault(region_id, []).append((row, col))  # Correct usage
+
+    #     return region_dict  # Return the constructed dictionary
+    
     def set_region_dict(self):
         """Creates and returns a dictionary mapping region IDs to their (row, col) coordinates."""
-        region_dict = {}  # Initialize an empty dictionary
+        region_dict = defaultdict(set)
 
         for row in range(self.size):
             for col in range(self.size):
                 region_id = self.region_map[row][col]
-                region_dict.setdefault(region_id, []).append((row, col))  # Correct usage
+                region_dict[region_id].add((row, col))
 
         return region_dict  # Return the constructed dictionary
-        
-
-    def __eq__(self, other):
-        if not isinstance(other, Board):
-            return False
-        return (
-            self.name == other.name and
-            self.size == other.size and
-            self.region_map == other.region_map and
-            self.pieces == other.pieces
-        )
-
-
-
     
+    
+    def copy_pieces(self):
+        queens_copy = deepcopy(self.queens)
+        markers_copy = deepcopy(self.markers)
+
+        return (queens_copy, markers_copy)
+    
+    def copy(self, new_state):
+        self.queens = deepcopy(new_state.queens)
+        self.markers = deepcopy(new_state.markers)
         
     def reset_board(self):
-        self.pieces = [[0 for _ in range(self.size)] for _ in range(self.size)]
-        self.region_dict = self.set_region_dict()
-
-
-    def remove_position_from_region(self, region_id, position):
-        """Removes a specific (row, col) tuple from the given region_id in region_dict."""
-        if region_id in self.region_dict:
-            try:
-                self.region_dict[region_id].remove(position)  # position is a tuple (row, col)
-                if not self.region_dict[region_id]:  # Remove the region if empty
-                    del self.region_dict[region_id]
-            except ValueError:
-                # print(f"Position {position} not found in region {region_id}.")
-                return
-        # else:
-        #     # print(f"Region {region_id} does not exist.")
-
-
-    def place_piece(self, row, col, val):
-        if 0 <= row < self.size and 0 <= col < self.size:
-
-            self.pieces[row][col] = val
-
-            region_id = self.region_map[row][col]
-            
-            self.remove_position_from_region(region_id, (row,col))
-
-    def remove_piece(self, row, col):
-            
-        self.pieces[row][col] = 0
-
-        region_id = self.region_map[row][col]
+        self.queens = set()
+        self.markers = set()
         
-        self.region_dict.setdefault(region_id, []).append((row, col))
-
+    def is_empty(self):
+        if not self.queens and not self.markers:
+            return True
+        return False
         
-
-        
-
-    def player_modify_piece(self, row, col, val):
-        if 0 <= row < self.size and 0 <= col < self.size:
-
-            # If empty or toggle piece, update dict
-            if self.pieces[row][col] == 0:
-                self.place_piece(row,col,val)
-
-            elif self.pieces[row][col] == val:
-                self.remove_piece(row,col)
-
-            # If switching between X/Queen, no need to update dict
-            else:
-                self.pieces[row][col] = val
-        else:
-            print("Invalid position")
-            
-            
-    def draw_board(self, screen, win = False):
-
-
-        CELL_SIZE = 600 // self.size
-        WINDOW_SIZE = CELL_SIZE * self.size
-
-        padding = CELL_SIZE//10
-        thickness = CELL_SIZE//40
-
-        # Draw regions
-
-
-        for row in range(self.size):
-            for col in range(self.size):
-                color_code = self.region_map[row][col]
-                color = REGION_COLORS[color_code]
-                
-
-
-                pygame.draw.rect(screen, color, (col * CELL_SIZE, row * CELL_SIZE, CELL_SIZE, CELL_SIZE))
-
-
-        # Draw pieces 
-        for row in range(self.size):
-            for col in range(self.size):
-                if self.pieces[row][col] == 1:
-                    pygame.draw.circle(screen, BLACK, (CELL_SIZE * col + CELL_SIZE // 2 , CELL_SIZE * row + CELL_SIZE // 2),CELL_SIZE//2-padding,thickness)
-                elif self.pieces[row][col] == -1:
-                    pygame.draw.line(screen, BLACK,
-                                        (col * CELL_SIZE + padding, row * CELL_SIZE + padding), 
-                                        ((col+1)*CELL_SIZE - padding, (row+1)*CELL_SIZE - padding),
-                                        thickness) 
-                    
-                    pygame.draw.line(screen, BLACK,
-                                        (col * CELL_SIZE + padding, (row+1) * CELL_SIZE - padding), 
-                                        ((col+1)*CELL_SIZE - padding, row*CELL_SIZE + padding),
-                                        thickness) 
-                    
-
+    def cell_is_queen(self, row, col):
+        return (row, col) in self.queens
     
-        if win:
-            grid_color = GREEN
-        else:
-            grid_color = BLACK 
-        # Draw gridlines
-        for i in range(self.size + 1):
-            pygame.draw.line(screen, grid_color, (i * CELL_SIZE, 0), (i * CELL_SIZE, WINDOW_SIZE), 2)  # Vertical
-            pygame.draw.line(screen, grid_color, (0, i * CELL_SIZE), (WINDOW_SIZE, i * CELL_SIZE), 2)  # Horizontal
-            
-        pygame.display.flip()
+    def cell_is_marker(self, row, col):
+        return (row, col) in self.markers
+    
+    def cell_is_empty(self, row, col):
+        if not self.cell_is_queen(row, col) and not self.cell_is_marker(row, col):
+            return True
+        return False
+    
+        
+    def place_queen(self, row, col):
+        if 0 <= row < self.size and 0 <= col < self.size:
+            self.queens.add((row,col))
+
+    def remove_queen(self, row, col):
+        if 0 <= row < self.size and 0 <= col < self.size:
+            self.queens.discard((row,col))
+
+    def place_marker(self, row, col):
+        if 0 <= row < self.size and 0 <= col < self.size:
+            self.markers.add((row,col))
+
+    def remove_marker(self, row, col):
+        if 0 <= row < self.size and 0 <= col < self.size:
+            self.markers.discard((row,col))
+
+    def player_autofill_queen(self, queen_row, queen_col):
 
 
-    def queen_autofill(self, queen_row, queen_col):
+        
+        # Optionally get the region ID if needed (not used in this code)
+        region_id = self.region_map[queen_row][queen_col]
+        
+        # Remove the queen from its current position.
+        self.remove_queen(queen_row, queen_col)
+        
+        # Process the queen's column: For every row except queen_row,
+        # remove any queen (if present) and place a marker.
+        for row in range(self.size):
+            if row != queen_row:
+                self.remove_queen(row, queen_col)  # Unconditionally remove any queen
+                self.place_marker(row, queen_col)  # Place marker in this cell
+        
+        # Process the queen's row: For every column except queen_col,
+        # remove any queen (if present) and place a marker.
+        for col in range(self.size):
+            if col != queen_col:
+                self.remove_queen(queen_row, col)
+                self.place_marker(queen_row, col)
+
+        for r_offset, c_offset in [(-1, -1), (-1, 1), (1, -1), (1, 1)]:
+
+            n_row = queen_row + r_offset
+            n_col = queen_col + c_offset
+
+            self.remove_queen(n_row, n_col)
+            self.place_marker(n_row, n_col)
+
+        for row, col in self.regions_dict[region_id]:
+            self.remove_queen(row,col)
+            self.place_marker(row,col)
+        
+        # Remove any marker from the queen's original cell,
+        # then place the queen back in that position.
+        self.remove_marker(queen_row, queen_col)
+        self.place_queen(queen_row, queen_col)
+
+
+    # Assume that we never wipe a previous queen or marker
+    def algo_autofill_queen(self, queen_row, queen_col):
+        self.place_queen(queen_row, queen_col)
+        
+        # new_markers = set()
 
         region_id = self.region_map[queen_row][queen_col]
 
-              
         for row in range(self.size):
-            for col in range(self.size):
-                if row == queen_row and col == queen_col:
-                    self.place_piece(row, col, 1)
+            if (row, queen_col) in self.markers or row == queen_row:
+                continue
 
-                else:
-                    if row == queen_row:
-                        self.place_piece(row, col, -1)
-                    elif col == queen_col:
-                        self.place_piece(row, col, -1)
-                    elif self.region_map[row][col] == region_id:
-                        self.place_piece(row,col,-1)
+            # new_markers.add((row, queen_col))
+            self.place_marker(row, queen_col)
 
-        self.place_piece(queen_row-1,queen_col-1,-1)
-        self.place_piece(queen_row-1,queen_col+1,-1)
-        self.place_piece(queen_row+1,queen_col-1,-1)
-        self.place_piece(queen_row+1,queen_col+1,-1)
+        for col in range(self.size):
+            if (queen_row, col) in self.markers or col == queen_col:
+                continue
 
+            # new_markers.add((queen_row, col))
+            self.place_marker(queen_row, col)
+
+        for r_offset, c_offset in [(-1, -1), (-1, 1), (1, -1), (1, 1)]:
+
+            n_row = queen_row + r_offset
+            n_col = queen_col + c_offset
+
+            if (n_row, n_col) in self.markers: continue
+
+            self.place_marker(n_row, n_col)
+
+            # if 0 <= n_row < self.size and 0 <= n_col < self.size:
+            #     new_markers.add((n_row, n_col))
+
+        for row, col in self.regions_dict[region_id]:
+            if (row, col) in self.markers: continue
+            if row == queen_row and col == queen_col: continue
+
+            self.place_marker(row, col)
+            # new_markers.add((row,col))
+
+
+        # return new_markers
+
+    def hypothetical_autofill(self, queen_row, queen_col):
+        hyp_markers = set()
+
+         # Optionally get the region ID if needed (not used in this code)
+        region_id = self.region_map[queen_row][queen_col]
         
-    def solve_autofill(self):
-        
-        prev_pieces = copy.deepcopy(self.pieces)
-        # self.reset_board()
-        
+       
+        # Process the queen's column: For every row except queen_row,
+        # remove any queen (if present) and place a marker.
         for row in range(self.size):
-            for col in range(self.size):
-                if prev_pieces[row][col] == 1:
-                    self.queen_autofill(row,col)
+            if row != queen_row:
+                hyp_markers.add((row, queen_col))  # Place marker in this cell
         
+        # Process the queen's row: For every column except queen_col,
+        # remove any queen (if present) and place a marker.
+        for col in range(self.size):
+            if col != queen_col:
+                hyp_markers.add((queen_row, col))
 
+        for r_offset, c_offset in [(-1, -1), (-1, 1), (1, -1), (1, 1)]:
+
+            n_row = queen_row + r_offset
+            n_col = queen_col + c_offset
+
+            if 0 <= n_row < self.size and 0 <= n_col < self.size:
+                hyp_markers.add((n_row,n_col))
+
+        for row, col in self.regions_dict[region_id]:
+            if row == queen_row and col == queen_col:
+                continue
+            hyp_markers.add((row,col))
+        
+        return hyp_markers
