@@ -12,27 +12,27 @@ from board import Board
 from validation import Validator
 from solve import Solver
 from deduce import Deducer
-from main import update_archive
+from update_maps import MapData
 
 # Paths to JSON files
 MAPS_FILE_ORIGINAL = "data/maps.json"
 MAPS_FILE_ARCHIVE = "data/archivedqueens.json"
 
-def load_map_data(maps_file):
-    """Loads all map data from the JSON file into memory."""
-    with open(maps_file, "r") as file:
-        data = json.load(file)
-    return data
+# def load_map_data(maps_file):
+#     """Loads all map data from the JSON file into memory."""
+#     with open(maps_file, "r") as file:
+#         data = json.load(file)
+#     return data
 
 # Load the map data once at the beginning
-original_data = load_map_data(MAPS_FILE_ORIGINAL)
-archive_data = load_map_data(MAPS_FILE_ARCHIVE)
+archive_data = MapData(is_archive=True).data
+original_data = MapData(is_archive=False).data
+
+
+
 
 def load_map_ids(data):
     """Loads all map IDs from the given data."""
-    
-    update_archive()
-    
     if isinstance(data, list):  # If the data is a list of maps
         return [entry['id'] for entry in data]
     else:  # Assuming the data is a dict for the original dataset
@@ -67,6 +67,7 @@ def full_deduction(board: Board, deducer: Deducer, solver: Solver, validator: Va
     deducer.full_reduce_board(board)
     return validator.validate_win(board)
 
+# Test class for original dataset
 class TestOriginal(unittest.TestCase):
     """Tests for the original dataset."""
     
@@ -88,10 +89,12 @@ for mapNum in range(1, 101):
         self._test_OG(mapNum)
     setattr(TestOriginal, f'test_OG_map_{mapNum}', test_method)
 
+# Test class for archived dataset
 class TestArchive(unittest.TestCase):
     """Tests for the archived dataset."""
     
     def _test_ARCH(self, mapNum):
+        
         board = get_board_data(archive_data, mapNum, is_archive=True)
         validator = Validator()
         solver = Solver()
@@ -103,7 +106,7 @@ class TestArchive(unittest.TestCase):
         
         self.assertTrue(solved, f"Algorithm BFOS failed on Map {mapNum} (Time: {elapsed_time:.4f}s)")
 
-# Load map IDs dynamically for the archived dataset
+# Load map IDs dynamically for the archived dataset using MapData
 MAP_IDS = load_map_ids(archive_data)
 for mapNum in MAP_IDS:
     def test_method(self, mapNum=mapNum):
