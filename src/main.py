@@ -16,7 +16,7 @@ from update_maps import MapData
 # Testing Internal_overlap: 287
 # Testing row_col_overlap: 179, 203, 180, 269
 
-MAPNUM = 313
+MAPNUM = -1
 ARCHIVE = True
 COLOR_PALETTE = "VIBRANT"
 
@@ -42,6 +42,9 @@ def get_archive_board_data(data, mapNum: int):
     
     formatted_dict = {entry['id']: entry for entry in data}
     
+    if mapNum == -1:
+        mapNum = max(formatted_dict.keys())
+
     if mapNum not in formatted_dict:
         raise ValueError(f"Map {mapNum} not found in the dataset.") 
 

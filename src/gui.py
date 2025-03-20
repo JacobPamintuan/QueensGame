@@ -24,6 +24,10 @@ class GUI:
         self.color_palette = colors["REGION_COLORS"][color_palette_name]
 
         self.screen = pygame.display.set_mode((self.WINDOW_SIZE, self.WINDOW_SIZE))
+
+        self.drag = False
+        self.drag_place = False
+
         pygame.display.set_caption(caption)
         
 
@@ -36,6 +40,7 @@ class GUI:
         self.screen = pygame.display.set_mode((self.WINDOW_SIZE, self.WINDOW_SIZE))
 
     def draw(self, board_data : Board, win):
+
         padding = self.CELL_SIZE//10
         thickness = self.CELL_SIZE//40
 
@@ -89,8 +94,12 @@ class GUI:
                 board_data.remove_queen(row, col)
                 board_data.place_marker(row, col)
             elif (row, col) in board_data.markers:
+                # If dragged, erase markers 
+                self.drag_place = False
                 board_data.remove_marker(row, col)
             else:
+                # If dragged, place markers 
+                self.drag_place = True
                 board_data.place_marker(row, col)
 
         else:
@@ -101,6 +110,18 @@ class GUI:
                 board_data.remove_queen(row, col)
             else:
                 board_data.place_queen(row, col)
+        
+    def drag_markers(self, board_data : Board, row, col):
+
+        # Do not edit queens pos when dragging
+        if (row, col) in board_data.queens:
+            return
+        
+        # Drag to place or remove markers
+        if self.drag_place:
+            board_data.place_marker(row, col)
+        else:
+            board_data.remove_marker(row, col)
 
 
         
@@ -109,7 +130,21 @@ class GUI:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 return False, win
-            elif event.type == pygame.MOUSEBUTTONDOWN:
+            
+
+            if event.type == pygame.MOUSEMOTION:
+                if self.drag == True:
+                    x, y = event.pos
+                    col = x // self.CELL_SIZE
+                    row = y // self.CELL_SIZE    
+
+                    self.drag_markers(board_data, row, col)
+
+            if event.type == pygame.MOUSEBUTTONUP:
+                self.drag = False
+                self.drag_place = False
+
+            if event.type == pygame.MOUSEBUTTONDOWN:
 
                 self.history.append(board_data.copy_pieces())
 
@@ -119,7 +154,7 @@ class GUI:
 
                 if event.button == 1:  # Left click
                     self.toggle_pieces(board_data, 'X',row,col)
-                    
+                    self.drag = True
 
                 elif event.button == 3:  # Right click
                     self.toggle_pieces(board_data, 'O',row,col)
@@ -128,8 +163,8 @@ class GUI:
                     board_data.player_autofill_queen(row, col)
 
 
-                print(f"Queens: {board_data.queens}")
-                print(f"Markers: {board_data.markers}")
+                # print(f"Queens: {board_data.queens}")
+                # print(f"Markers: {board_data.markers}")
 
                 win = validator.validate_win(board_data)
 
@@ -141,7 +176,7 @@ class GUI:
             # D - Deduce
             # F - Full Deduce
             # S - Solve: Full Deduce -> BFOS
-            elif event.type == pygame.KEYDOWN:
+            if event.type == pygame.KEYDOWN:
 
                 if event.key != pygame.K_u:
                     self.history.append(board_data.copy_pieces())
