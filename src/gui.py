@@ -153,8 +153,12 @@ class GUI:
                 row = y // self.CELL_SIZE
 
                 if event.button == 1:  # Left click
+                    if board_data.cell_is_queen(row, col):
+                        self.drag = False
+                    else:
+                        self.drag = True
+                    
                     self.toggle_pieces(board_data, 'X',row,col)
-                    self.drag = True
 
                 elif event.button == 3:  # Right click
                     self.toggle_pieces(board_data, 'O',row,col)
