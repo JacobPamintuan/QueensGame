@@ -180,6 +180,10 @@ class GUI:
 
                 if event.key != pygame.K_u:
                     self.history.append(board_data.copy_pieces())
+                    if event.key != pygame.K_r:
+                        if not validator.validate_board(board_data):
+                            print("Invalid Board State!!! Cannot deduce/solve")
+                            continue
 
 
                 if event.key == pygame.K_u:
