@@ -19,6 +19,7 @@ from update_maps import MapData
 MAPNUM = -1
 ARCHIVE = True
 COLOR_PALETTE = "VIBRANT"
+# COLOR_PALETTE = "PASTEL"
 
 MAPS_FILE_ORIGINAL = "data/maps.json"
 MAPS_FILE_ARCHIVE = "data/archivedqueens.json"
@@ -44,6 +45,7 @@ def get_archive_board_data(data, mapNum: int):
     
     if mapNum == -1:
         mapNum = max(formatted_dict.keys())
+        print(f"Loading latest map: {mapNum}")
 
     if mapNum not in formatted_dict:
         raise ValueError(f"Map {mapNum} not found in the dataset.") 
