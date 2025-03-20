@@ -142,26 +142,33 @@ class GUI:
             # F - Full Deduce
             # S - Solve: Full Deduce -> BFOS
             elif event.type == pygame.KEYDOWN:
+
+                if event.key != pygame.K_u:
+                    self.history.append(board_data.copy_pieces())
+
+
                 if event.key == pygame.K_u:
                     if self.history:
                         print("UNDO!")
                         history = self.history.pop()
                         board_data.queens = history[0]
                         board_data.markers = history[1]
+                        win = validator.validate_win(board_data)
+
                     else:
                         print("Nothing to undo")
 
-                if event.key == pygame.K_b:
+                elif event.key == pygame.K_b:
                     win = solver.brute_force(board_data)
                     if not win:
                         print("NO SOLUTION FOUND FROM CURRENT BOARD STATE")
                         
-                if event.key == pygame.K_o:
+                elif event.key == pygame.K_o:
                     win = solver.brute_force_optimal_seed(board_data)
                     if not win:
                         print("NO SOLUTION FOUND FROM CURRENT BOARD STATE")
 
-                if event.key == pygame.K_d:
+                elif event.key == pygame.K_d:
 
                     start = time.time()
                     deducer.step_reduce_board(board_data)
@@ -171,7 +178,7 @@ class GUI:
 
                     print(f"STEP DEDUCTION took {elapsed:.6f} seconds")
 
-                if event.key == pygame.K_f:
+                elif event.key == pygame.K_f:
 
                     start = time.time()
                     deducer.full_reduce_board(board_data)
@@ -182,7 +189,7 @@ class GUI:
                     print(f"FULL DEDUCTION took {elapsed:.6f} seconds")
                     win = validator.validate_win(board_data)
                 
-                if event.key == pygame.K_s:
+                elif event.key == pygame.K_s:
                     start = time.time()
                     deducer.full_reduce_board(board_data)
                     
@@ -198,5 +205,6 @@ class GUI:
                     board_data.reset_board()
                     print("RESET")
                     win = False
+
 
         return True, win

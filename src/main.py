@@ -16,7 +16,7 @@ from update_maps import MapData
 # Testing Internal_overlap: 287
 # Testing row_col_overlap: 179, 203, 180, 269
 
-MAPNUM = 77
+MAPNUM = 313
 ARCHIVE = True
 COLOR_PALETTE = "VIBRANT"
 

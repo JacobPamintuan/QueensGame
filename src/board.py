@@ -11,16 +11,6 @@ class Board:
 
         self.regions_dict = self.set_region_dict()
 
-    # def set_region_dict(self):
-    #     """Creates and returns a dictionary mapping region IDs to their (row, col) coordinates."""
-    #     region_dict = {}  # Initialize an empty dictionary
-
-    #     for row in range(self.size):
-    #         for col in range(self.size):
-    #             region_id = self.region_map[row][col]
-    #             region_dict.setdefault(region_id, []).append((row, col))  # Correct usage
-
-    #     return region_dict  # Return the constructed dictionary
     
     def set_region_dict(self):
         """Creates and returns a dictionary mapping region IDs to their (row, col) coordinates."""
@@ -31,8 +21,7 @@ class Board:
                 region_id = self.region_map[row][col]
                 region_dict[region_id].add((row, col))
 
-        return region_dict  # Return the constructed dictionary
-    
+        return region_dict 
     
     def copy_pieces(self):
         queens_copy = deepcopy(self.queens)
